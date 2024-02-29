@@ -8,7 +8,20 @@ import {
   CardFooter,
   Button,
 } from "@nextui-org/react";
-const MusicCard = () => {
+interface MusicCardProps {
+  link?: string;
+  artist?: string;
+  title?: string;
+  onClick?: () => void;
+  id?: string;
+}
+const MusicCard = ({
+  link = "",
+  artist = "",
+  title = "",
+  onClick,
+  id = "",
+}: MusicCardProps) => {
   return (
     <Card
       isFooterBlurred
@@ -17,19 +30,19 @@ const MusicCard = () => {
       isBlurred
     >
       <Image
-        alt="Woman listing to music"
+        alt="thubnail"
         className="object-cover"
         height={320}
-        src="https://i.scdn.co/image/ab67616d0000b273318443aab3531a0558e79a4d"
+        src={link}
         width={320}
       />
       <CardFooter className="justify-between before:bg-white/10 border-white/20 border-1 overflow-hidden py-1 absolute before:rounded-xl rounded-large bottom-1 w-[calc(100%_-_8px)] shadow-small ml-1 z-10">
-        <p className="text-tiny text-white/80">
+        <p className="text-tiny text-black/95">
           <p className="font-bold">
             {" "}
-            All Too Well (10 Minute Version) (Taylor's Version) (From The Vault)
+            {title.length > 20 ? title.substring(0, 29) + "..." : title}
           </p>{" "}
-          - Taylor Swift
+          - {artist}
         </p>
         <Button
           className="text-tiny text-white bg-black/20"
@@ -37,6 +50,7 @@ const MusicCard = () => {
           color="default"
           radius="lg"
           size="md"
+          onClick={onClick}
         >
           Add to Queue
         </Button>

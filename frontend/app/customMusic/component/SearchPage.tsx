@@ -86,8 +86,17 @@ const SearchPage = () => {
           </Button>
         </CardHeader>
 
-        <CardBody className="overflow-visible py-2  grid md:grid-cols-1 xl:grid-cols-3 items-center justify-center ">
-          <MusicCard /> <MusicCard />
+        <CardBody className="overflow-visible py-2  grid md:grid-cols-1 xl:grid-cols-4 items-center justify-center ">
+          <MusicCard
+            title="Nothing New (feat. Phoebe Bridgers) (Taylor’s Version) (From The Vault)"
+            artist="Taylor Swift"
+            link="https://i.scdn.co/image/ab67616d0000b273318443aab3531a0558e79a4d"
+          />{" "}
+          <MusicCard
+            title="Garageband Superstar"
+            artist="Lauran Hibberd"
+            link="https://i.scdn.co/image/ab67616d0000b27375c282962ccd42f6e0e11e04"
+          />
         </CardBody>
       </Card>
     </div>
