@@ -1,6 +1,13 @@
 import Image from "next/image";
 
-const NowPlaying = () => {
+interface Props {
+  title?: string;
+  artist?: string;
+  link?: string;
+}
+const NowPlaying = (
+  { title, artist, link }: Props = { title: "", artist: "", link: "" }
+) => {
   return (
     <div className="recent-track bg-blue-900/10 p-2 rounded-lg">
       <div className="recent-track__icon">
@@ -10,8 +17,10 @@ const NowPlaying = () => {
         <span></span>
       </div>
       <div className="recent-track__body js-track text-xl text-gray-500">
-        <h4 className="recent-track__name font-semibold">Timeless</h4>
-        <p className="recent-track__artist"> - Taylor Swift</p>
+        <a href={link}>
+          <h4 className="recent-track__name font-semibold">{title}</h4>
+        </a>
+        <p className="recent-track__artist"> - {artist}</p>
       </div>
     </div>
   );
