@@ -42,8 +42,28 @@ const HomePage = () => {
               >
                 <Tab key="photos" title="Sides">
                   <Card className=" border-cyan-300 border-1">
-                    <CardBody className="flex ">
-                      <ItemBox />
+                    <CardBody className="flex flex-row gap-5">
+                      <ItemBox
+                        title="French Fries"
+                        imageUrl="/food/frenchFries.webp"
+                        price={90}
+                        misc="Must Order"
+                        description="Immerse yourself in the crispy perfection of hand-cut, golden
+                        potatoes, artfully seasoned to savory perfection. Each bite unveils a
+                        symphony of textures the satisfying crunch giving way to a fluffy
+                        interior that melts in your mouth"
+                        className="bg-gradient-to-r from-yellow-400/50 to-orange-600/30"
+                      />
+                            <ItemBox
+                        title="Garlic Bread"
+                        imageUrl="/food/frenchFries.webp"
+                        price={90}
+                        misc="Must Order"
+                        description="Immerse yourself in the crispy perfection of hand-cut, golden
+                        potatoes, artfully seasoned to savory perfection. Each bite unveils a
+                        symphony of textures the satisfying crunch giving way to a fluffy
+                        interior that melts in your mouth"
+                      />
                     </CardBody>
                   </Card>
                 </Tab>

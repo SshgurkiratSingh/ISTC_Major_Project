@@ -9,35 +9,44 @@ import {
   Button,
   Chip,
 } from "@nextui-org/react";
-
-const ItemBox = () => {
+interface ItemBoxProps {
+  title: string;
+  imageUrl: string;
+  price: number;
+  className?: string;
+  onClick?: () => void;
+  description?: string;
+  misc?: string;
+}
+const ItemBox = ({
+  title = "",
+  imageUrl = "",
+  price = 0,
+  className = "bg-gradient-to-r from-blue-400/50 to-green-600/50",
+  onClick,
+  misc = "new",
+  description = "a",
+}: ItemBoxProps) => {
   return (
-    <div className="w-full max-w-sm bg-gradient-to-r from-yellow-400/50 to-orange-600/30  border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+    <div
+      className={`w-full max-w-sm  ${className} border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700`}
+    >
       <div className="relative top-2 left-4">
-        <Chip className="p-2 fixed ">Most Popular</Chip>
+        <Chip className="p-2 fixed ">{misc}</Chip>
       </div>
 
-      <img
-        className="p-8 rounded-full"
-        src="/food/frenchFries.webp"
-        alt="product image"
-      />
+      <img className="p-8 rounded-full" src={imageUrl} alt="product image" />
 
       <div className="px-5 pb-5">
         <a href="#">
           <h5 className="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">
-            French Fries
+            {title}
           </h5>
         </a>
-        <div className="flex items-center mt-2.5 mb-5">
-          Immerse yourself in the crispy perfection of hand-cut, golden
-          potatoes, artfully seasoned to savory perfection. Each bite unveils a
-          symphony of textures the satisfying crunch giving way to a fluffy
-          interior that melts in your mouth
-        </div>
+        <div className="flex items-center mt-2.5 mb-5">{description}</div>
         <div className="flex items-center justify-between">
           <span className="text-3xl font-bold text-gray-900 dark:text-white">
-            ₹90
+            ₹{price}
           </span>
           <Button color="warning">Customise</Button>
         </div>
