@@ -14,17 +14,42 @@ import {
 import React, { useEffect, useState } from "react";
 import MusicCard from "@/app/component/Music/MusicCard";
 import { CiSearch } from "react-icons/ci";
+import API_BASE_URL from "@/APIconfig";
 const SearchPage = () => {
   const [currentPlaying, setCurrentPlaying] = useState({
     artist: "",
     title: "",
     link: "",
   });
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const fetchSearchResults = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/spotify/search`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ query: searchQuery }), // Ensure the API expects the query in this format
+      });
+      const data = await response.json();
+      setSearchResults(data.body.tracks.items); // Assuming the API returns an array of search results
+    } catch (error) {
+      console.error("Error fetching search results:", error);
+    }
+  };
+  const handleKeyPress = (e: { key: string }) => {
+    if (e.key === "Enter") {
+      fetchSearchResults(); // Call the search function when Enter key is pressed
+    }
+  };
+
   useEffect(() => {
     const fetchCurrentPlaying = async () => {
       try {
         const response = await fetch(
-          "http://192.168.1.100:2500/api/v1/spotify/currentQueue"
+          `${API_BASE_URL}/api/v1/spotify/currentQueue`
         );
         const data = await response.json();
         setCurrentPlaying({
@@ -42,7 +67,7 @@ const SearchPage = () => {
   return (
     <div className=" min-h-screen flex-col items-center justify-between  text-white p-4 ">
       <Card
-        className="py-4 bg-black/50 min-h-screen min-w-24 dark"
+        className="py-4 bg-black/20 min-h-screen min-w-24 dark"
         style={{ backdropFilter: "blur(25px)" }}
       >
         <CardHeader className="pb-2 pt-0 px-4 gap-1 flex-col items-center">
@@ -77,26 +102,32 @@ const SearchPage = () => {
               ],
             }}
             placeholder="Type to search..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             startContent={
               <CiSearch className="text-black/50 mb-0.5 dark:text-white/90 text-slate-400 pointer-events-none flex-shrink-0" />
             }
+            onKeyPress={handleKeyPress}
+            onClear={() => setSearchQuery("")}
           />
-          <Button className="bg-default-700/50 dark:bg-default/60">
+          <Button
+            className="bg-default-700/50 dark:bg-default/60"
+            onClick={fetchSearchResults}
+          >
             Search
           </Button>
         </CardHeader>
 
-        <CardBody className="overflow-visible py-2  grid md:grid-cols-1 xl:grid-cols-4 items-center justify-center ">
-          <MusicCard
-            title="Nothing New (feat. Phoebe Bridgers) (Taylor’s Version) (From The Vault)"
-            artist="Taylor Swift"
-            link="https://i.scdn.co/image/ab67616d0000b273318443aab3531a0558e79a4d"
-          />{" "}
-          <MusicCard
-            title="Garageband Superstar"
-            artist="Lauran Hibberd"
-            link="https://i.scdn.co/image/ab67616d0000b27375c282962ccd42f6e0e11e04"
-          />
+        <CardBody className="overflow-visible py-2  grid md:grid-cols-1 xl:grid-cols-4 items-center justify-center gap-1 ">
+          {searchResults.map((result, index) => (
+            <MusicCard
+              key={index}
+              title={result.name}
+              artist={result.artists[0].name}
+              link={result.album.images[0].url}
+              id={result.uri}
+            />
+          ))}
         </CardBody>
       </Card>
     </div>

@@ -9,6 +9,31 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
+}
+
+model FoodItem {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  misc        String?  @default("new")
+  description String?
+  className   String? 
+  price       Float
+  category    String
+  available   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  imageUrl    String?
+  addOns      AddOn[]
+}
+
+model AddOn {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  name  String
+  url   String
+  price Float
+
+  FoodItem   FoodItem? @relation(fields: [foodItemId], references: [id])
+  foodItemId String?   @db.ObjectId
 }

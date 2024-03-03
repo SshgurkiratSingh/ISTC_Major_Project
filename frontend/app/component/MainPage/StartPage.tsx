@@ -10,10 +10,10 @@ import {
   Tab,
 } from "@nextui-org/react";
 import NowPlaying from "./NowPlaying";
-
+import ItemBox from "../itemBox";
 const HomePage = () => {
   return (
-    <div className=" min-h-screen flex-col items-center justify-between  text-white p-4 ">
+    <div className=" min-h-[80vh] flex-col items-center justify-between  text-white p-4 ">
       <Card
         className="py-4 bg-black/30 min-h-screen min-w-24"
         style={{ backdropFilter: "blur(25px)" }}
@@ -40,24 +40,16 @@ const HomePage = () => {
                 color="secondary"
                 radius="full"
               >
-                <Tab key="photos" title="Burgers">
+                <Tab key="photos" title="Sides">
                   <Card className=" border-cyan-300 border-1">
-                    <CardBody>
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                      sed do eiusmod tempor incididunt ut labore et dolore magna
-                      aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                      ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                    <CardBody className="flex ">
+                      <ItemBox />
                     </CardBody>
                   </Card>
                 </Tab>
                 <Tab key="music" title="Pizza">
                   <Card>
-                    <CardBody>
-                      Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                      laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-                      irure dolor in reprehenderit in voluptate velit esse
-                      cillum dolore eu fugiat nulla pariatur.
-                    </CardBody>
+                    <CardBody></CardBody>
                   </Card>
                 </Tab>
                 <Tab key="s" title="Sides">
@@ -96,6 +88,9 @@ const HomePage = () => {
               </Button>
               <Button color="warning" variant="shadow">
                 Add Item
+              </Button>
+              <Button color="default" variant="shadow">
+                Login
               </Button>
             </div>
           </div>

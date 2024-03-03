@@ -1,5 +1,11 @@
 import Image from "next/image";
 import SearchPage from "./component/SearchPage";
+import { Bounce, ToastContainer } from "react-toastify";
 export default function Home() {
-  return <SearchPage />;
+  return (
+    <>
+      {/* <ToastContainer theme="dark" closeOnClick transition={Bounce} /> */}
+      <SearchPage />
+    </>
+  );
 }

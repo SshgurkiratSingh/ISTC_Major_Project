@@ -18,7 +18,10 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: url("/back2.webp") no-repeat;
+  /* background: url("/back2.webp") no-repeat; */
+  background: rgb(174,183,238);
+ background: linear-gradient(167deg, rgb(7, 13, 48) , rgb(36, 14, 43), rgb(5, 47, 107) );
+
   background-color: rgb(var(--background-end-rgb));
   background-size: cover;
   background-position: center;

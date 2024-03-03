@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Card,
   CardHeader,
@@ -8,6 +8,8 @@ import {
   CardFooter,
   Button,
 } from "@nextui-org/react";
+import { toast } from "react-toastify";
+import API_BASE_URL from "@/APIconfig";
 interface MusicCardProps {
   link?: string;
   artist?: string;
@@ -22,6 +24,33 @@ const MusicCard = ({
   onClick,
   id = "",
 }: MusicCardProps) => {
+  useEffect(() => {
+    toast.success("Track added to queue");
+  }, []);
+  const handleAddToQueue = async () => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/v1/spotify/addToQueue`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id }), // Send the track ID in the request body
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+
+      // Handle the success response here, e.g., a confirmation message
+      toast.success("Track added to queue");
+    } catch (error) {
+      console.error("Error adding track to queue:", error);
+    }
+  };
+
   return (
     <Card
       isFooterBlurred
@@ -37,7 +66,7 @@ const MusicCard = ({
         width={320}
       />
       <CardFooter className="justify-between before:bg-white/10 border-white/20 border-1 overflow-hidden py-1 absolute before:rounded-xl rounded-large bottom-1 w-[calc(100%_-_8px)] shadow-small ml-1 z-10">
-        <p className="text-tiny text-black/95">
+        <p className="text-tiny text-white/95">
           <p className="font-bold">
             {" "}
             {title.length > 20 ? title.substring(0, 29) + "..." : title}
@@ -50,7 +79,7 @@ const MusicCard = ({
           color="default"
           radius="lg"
           size="md"
-          onClick={onClick}
+          onClick={handleAddToQueue}
         >
           Add to Queue
         </Button>
