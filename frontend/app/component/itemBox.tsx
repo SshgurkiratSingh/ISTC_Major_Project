@@ -32,7 +32,7 @@ const ItemBox = ({
       className={`w-full max-w-sm  ${className} border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700`}
     >
       <div className="relative top-2 left-4">
-        <Chip className="p-2 fixed ">{misc}</Chip>
+        <Chip className="p-2">{misc}</Chip>
       </div>
 
       <img className="p-8 rounded-full" src={imageUrl} alt="product image" />
