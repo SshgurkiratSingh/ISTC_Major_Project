@@ -11,7 +11,58 @@ import {
 } from "@nextui-org/react";
 import NowPlaying from "./NowPlaying";
 import ItemBox from "../itemBox";
+import { useEffect, useState } from "react";
+import API_BASE_URL from "@/APIconfig";
+interface FoodItem {
+  id: string;
+  name: string;
+  misc?: string;
+  description: string;
+  className: string;
+  price: number;
+  category: string;
+  available: boolean;
+  createdAt: string;
+  updatedAt: string;
+  imageUrl: string;
+  addOns: AddOn[];
+}
+
+interface AddOn {
+  id: string;
+  name: string;
+  url: string;
+  price: number;
+  foodItemId: string;
+}
+
+// Assuming your top-level structure is an object with category names as keys and arrays of FoodItems as values
+interface MenuData {
+  [category: string]: FoodItem[];
+}
+
 const HomePage = () => {
+  const [itemData, setItemData] = useState<MenuData>();
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/v1/item`);
+        if (response.status === 200) {
+          const data = await response.json();
+          setItemData(data);
+        } else {
+          // Handle error scenario (e.g., display an error message)
+          console.error("Failed to fetch data:", response.statusText);
+        }
+      } catch (error) {
+        // Handle potential errors during fetch operation
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <div className=" min-h-[80vh] flex-col items-center justify-between  text-white p-4 ">
       <Card
@@ -40,8 +91,27 @@ const HomePage = () => {
                 color="secondary"
                 radius="full"
               >
-                <Tab key="photos" title="Sides">
-                  <Card className=" border-cyan-300 border-1">
+                {Object.keys(itemData ?? {}).map((category) => (
+                  <Tab key={category} title={category}>
+                    <Card>
+                      <CardBody className="flex flex-row gap-5">
+                        {itemData?.[category]?.map((item) => (
+                          <ItemBox
+                            key={item.id}
+                            title={item.name}
+                            imageUrl={`/food/${item.imageUrl}`}
+                            price={item.price}
+                            misc={item.misc}
+                            description={item.description}
+                            className={item.className}
+                          />
+                        ))}
+                      </CardBody>
+                    </Card>
+                  </Tab>
+                ))}
+                {/* <Tab key="Sideweges" title="wgqe" className="hidden">
+                  <Card className=" ">
                     <CardBody className="flex flex-row gap-5">
                       <ItemBox
                         title="French Fries"
@@ -52,46 +122,14 @@ const HomePage = () => {
                         potatoes, artfully seasoned to savory perfection. Each bite unveils a
                         symphony of textures the satisfying crunch giving way to a fluffy
                         interior that melts in your mouth"
-                        className="bg-gradient-to-r from-yellow-400/50 to-orange-600/30"
-                      />
-                            <ItemBox
-                        title="Garlic Bread"
-                        imageUrl="/food/frenchFries.webp"
-                        price={90}
-                        misc="Must Order"
-                        description="Immerse yourself in the crispy perfection of hand-cut, golden
-                        potatoes, artfully seasoned to savory perfection. Each bite unveils a
-                        symphony of textures the satisfying crunch giving way to a fluffy
-                        interior that melts in your mouth"
                       />
                     </CardBody>
                   </Card>
-                </Tab>
-                <Tab key="music" title="Pizza">
-                  <Card>
-                    <CardBody></CardBody>
-                  </Card>
-                </Tab>
-                <Tab key="s" title="Sides">
-                  <Card>
-                    <CardBody>
-                      Excepteur sint occaecat cupidatat non proident, sunt in
-                      culpa qui officia deserunt mollit anim id est laborum.
-                    </CardBody>
-                  </Card>
-                </Tab>
-                <Tab key="videos" title="Drinks">
-                  <Card>
-                    <CardBody>
-                      Excepteur sint occaecat cupidatat non proident, sunt in
-                      culpa qui officia deserunt mollit anim id est laborum.
-                    </CardBody>
-                  </Card>
-                </Tab>
+                </Tab> */}
               </Tabs>
             </div>
           </div>
-
+          <div className="bg-gradient-to-r from-yellow-400/50 to-orange-600/30  from-amber-200/50 to-amber-900/30 to-orange-900/30 from-green-200/50 to-orange-600/80 to-blue-600/30 from-green-500/80"></div>
           <div className="fixed bottom-10 bg-black/30 p-2 rounded-md text-white w-full">
             <div className="flex flex-row gap-2">
               <Button color="primary" variant="shadow">

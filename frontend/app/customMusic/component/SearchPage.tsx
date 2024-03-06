@@ -77,7 +77,6 @@ const SearchPage = () => {
             link={currentPlaying.link}
           />
           <Input
-            label="Search"
             isClearable
             radius="lg"
             classNames={{
@@ -86,6 +85,7 @@ const SearchPage = () => {
                 "bg-transparent",
                 "text-black/90 dark:text-white/90",
                 "placeholder:text-default-700/50 dark:placeholder:text-white/60",
+                "rounded-lg",
               ],
               innerWrapper: "bg-transparent",
               inputWrapper: [

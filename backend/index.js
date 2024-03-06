@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const rateLimit = require("express-rate-limit");
 const cors = require("cors");
-const morgan = require('morgan');
+const morgan = require("morgan");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
@@ -15,13 +15,17 @@ const limiter = rateLimit({
   max: 100, // limit each IP to 100 requests per windowMs
 });
 app.use(limiter);
-app.use(morgan('dev'));
-app.get('/', (req, res) => {
-    res.send('Hello World!');
-  });
-  
+app.use(morgan("dev"));
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
 const apiForSpotify = require("./routes/spotifyRoutes");
 app.use("/api/v1/spotify/", apiForSpotify);
+
+const apiForItemList = require("./routes/itemListRoute");
+app.use("/api/v1/item/", apiForItemList); 
+
 
 app.listen(port, "0.0.0.0", () => {
   console.log(`Server is online at port ${port}!`);
