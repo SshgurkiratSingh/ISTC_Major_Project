@@ -7,9 +7,9 @@ const SpotifyWebApi = require("spotify-web-api-node");
 require("dotenv").config();
 
 let spotify = new SpotifyWebApi({
-  clientId: process.env.SPOTIFY_CLIENT_ID,
+  clientId: "098d03c3aeaa4b75a14e3a76ca56f526",
   redirectUri: "http://localhost:2500/api/v1/spotify/callback",
-  clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
+  clientSecret: "bde5ee0269ad45cc81962e5d793f097b",
 });
 spotify.setAccessToken(process.env.SPOTIFY_TOKEN);
 router.post("/search", (req, res) => {
