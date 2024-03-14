@@ -13,6 +13,15 @@ import NowPlaying from "./NowPlaying";
 import ItemBox from "../itemBox";
 import { useEffect, useState } from "react";
 import API_BASE_URL from "@/APIconfig";
+import toast, { toastConfig } from "react-simple-toasts";
+import "react-simple-toasts/dist/theme/ocean-wave.css";
+toastConfig({
+  theme: "ocean-wave",
+  position: "top-right",
+  clickClosable: true,
+  className: "rounded-lg",
+});
+
 interface FoodItem {
   id: string;
   name: string;
@@ -28,12 +37,13 @@ interface FoodItem {
   addOns: AddOn[];
 }
 
-interface AddOn {
+export interface AddOn {
   id: string;
   name: string;
   url: string;
   price: number;
   foodItemId: string;
+  quantity?: number;
 }
 
 // Assuming your top-level structure is an object with category names as keys and arrays of FoodItems as values
@@ -43,6 +53,12 @@ interface MenuData {
 
 const HomePage = () => {
   const [itemData, setItemData] = useState<MenuData>();
+  const [cart, setCart] = useState<FoodItem[]>([]);
+  const [currentPlaying, setCurrentPlaying] = useState({
+    artist: "",
+    title: "",
+    link: "",
+  });
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -62,7 +78,25 @@ const HomePage = () => {
 
     fetchData();
   }, []);
+  useEffect(() => {
+    const fetchCurrentPlaying = async () => {
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/api/v1/spotify/currentQueue`
+        );
+        const data = await response.json();
+        setCurrentPlaying({
+          artist: data.body.item.artists[0].name,
+          title: data.body.item.name,
+          link: data.body.item.external_urls.spotify,
+        });
+      } catch (error) {
+        console.error("Error fetching current playing track:", error);
+      }
+    };
 
+    fetchCurrentPlaying();
+  }, []);
   return (
     <div className=" min-h-[80vh] flex-col items-center justify-between  text-white p-4 ">
       <Card
@@ -77,7 +111,10 @@ const HomePage = () => {
               </h4>
             </div>
             <div>
-              <NowPlaying />
+              <NowPlaying
+                title={currentPlaying.title}
+                artist={currentPlaying.artist}
+              />
             </div>
           </div>
           <Divider className="my-2 h-0.5 bg-white" />
@@ -93,7 +130,7 @@ const HomePage = () => {
               >
                 {Object.keys(itemData ?? {}).map((category) => (
                   <Tab key={category} title={category}>
-                    <Card>
+                    <Card className=" duration-150 animate-appearance-in ">
                       <CardBody className="flex flex-row gap-5">
                         {itemData?.[category]?.map((item) => (
                           <ItemBox
@@ -104,6 +141,7 @@ const HomePage = () => {
                             misc={item.misc}
                             description={item.description}
                             className={item.className}
+                            addOn={item.addOns}
                           />
                         ))}
                       </CardBody>
@@ -132,7 +170,11 @@ const HomePage = () => {
           <div className="bg-gradient-to-r from-yellow-400/50 to-orange-600/30  from-amber-200/50 to-amber-900/30 to-orange-900/30 from-green-200/50 to-orange-600/80 to-blue-600/30 from-green-500/80"></div>
           <div className="fixed bottom-10 bg-black/30 p-2 rounded-md text-white w-full">
             <div className="flex flex-row gap-2">
-              <Button color="primary" variant="shadow">
+              <Button
+                color="primary"
+                variant="shadow"
+                onClick={() => toast("Hello, World!")}
+              >
                 View Cart
               </Button>
               <Button color="danger" variant="shadow">
