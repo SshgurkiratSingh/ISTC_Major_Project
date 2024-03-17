@@ -11,18 +11,21 @@ import {
 } from "@nextui-org/react";
 import NowPlaying from "./NowPlaying";
 import ItemBox from "../itemBox";
+import Cart from "./Cart";
+import LoginPageForKiosk from "./Login";
 import { useEffect, useState } from "react";
 import API_BASE_URL from "@/APIconfig";
-import toast, { toastConfig } from "react-simple-toasts";
+// import toast, { toastConfig } from "react-simple-toasts";
 import "react-simple-toasts/dist/theme/ocean-wave.css";
-toastConfig({
-  theme: "ocean-wave",
-  position: "top-right",
-  clickClosable: true,
-  className: "rounded-lg",
-});
+import { Bounce, ToastContainer, toast } from "react-toastify";
+// toastConfig({
+//   theme: "ocean-wave",
+//   position: "top-right",
+//   clickClosable: true,
+//   className: "rounded-lg",
+// });
 
-interface FoodItem {
+export interface FoodItem {
   id: string;
   name: string;
   misc?: string;
@@ -40,10 +43,17 @@ interface FoodItem {
 export interface AddOn {
   id: string;
   name: string;
-  url: string;
+  url?: string;
   price: number;
-  foodItemId: string;
+  foodItemId?: string;
   quantity?: number;
+}
+export interface CartItem {
+  title: string;
+  imageUrl: string;
+  price: number;
+  quantity: number;
+  addOnIds?: AddOn[]; // Optional array of add-on objects (can be null)
 }
 
 // Assuming your top-level structure is an object with category names as keys and arrays of FoodItems as values
@@ -52,8 +62,65 @@ interface MenuData {
 }
 
 const HomePage = () => {
+  const clearCart = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/item/clearCart`, {
+        method: "GET",
+        headers: {
+          // Add any necessary headers for authentication or authorization (if applicable)
+          // "Authorization": `Bearer ${accessToken}`, // Example for token-based auth
+        },
+      });
+
+      if (response.status === 200) {
+        setCart([]); // Clear the local cart state immediately for a responsive UI
+        toast.success("Cart cleared successfully!"); // Show success toast notification
+        refreshCart(); // Refresh the cart data after clearing it
+      } else {
+        console.error("Failed to clear cart:", response.statusText);
+        // Handle error scenario (e.g., display an error message to the user)
+        toast.error("Error clearing cart. Please try again later.");
+      }
+    } catch (error) {
+      console.error("Error clearing cart:", error);
+      // Handle potential errors during fetch operation
+      toast.error(
+        "An error occurred while clearing your cart. Please try again."
+      );
+    }
+  };
+
+  const refreshCart = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/item/cart`, {
+        method: "GET",
+        headers: {
+          // Add any necessary headers for authentication or authorization (if applicable)
+          // "Authorization": `Bearer ${accessToken}`, // Example for token-based auth
+        },
+      });
+
+      if (response.status === 200) {
+        const cartData = await response.json();
+        // console.log(cartData); // Log the fetched cart data for debugging purposes
+        console.log("Cart data refreshed successfully!");
+        setCart(cartData); // Update cart state with fetched data
+      } else {
+        console.error("Failed to fetch cart data:", response.statusText);
+        // Handle error scenario (e.g., display an error message to the user)
+        toast.error("Error fetching cart data. Please try again later.");
+      }
+    } catch (error) {
+      console.error("Error fetching cart data:", error);
+      // Handle potential errors during fetch operation
+      toast.error(
+        "An error occurred while fetching your cart. Please try again."
+      );
+    }
+  };
+
   const [itemData, setItemData] = useState<MenuData>();
-  const [cart, setCart] = useState<FoodItem[]>([]);
+  const [cart, setCart] = useState<CartItem[]>([]);
   const [currentPlaying, setCurrentPlaying] = useState({
     artist: "",
     title: "",
@@ -77,6 +144,7 @@ const HomePage = () => {
     };
 
     fetchData();
+    refreshCart();
   }, []);
   useEffect(() => {
     const fetchCurrentPlaying = async () => {
@@ -142,56 +210,39 @@ const HomePage = () => {
                             description={item.description}
                             className={item.className}
                             addOn={item.addOns}
+                            onClk={() => {
+                              refreshCart();
+                            }}
                           />
                         ))}
                       </CardBody>
                     </Card>
                   </Tab>
                 ))}
-                {/* <Tab key="Sideweges" title="wgqe" className="hidden">
-                  <Card className=" ">
-                    <CardBody className="flex flex-row gap-5">
-                      <ItemBox
-                        title="French Fries"
-                        imageUrl="/food/frenchFries.webp"
-                        price={90}
-                        misc="Must Order"
-                        description="Immerse yourself in the crispy perfection of hand-cut, golden
-                        potatoes, artfully seasoned to savory perfection. Each bite unveils a
-                        symphony of textures the satisfying crunch giving way to a fluffy
-                        interior that melts in your mouth"
-                      />
-                    </CardBody>
-                  </Card>
-                </Tab> */}
               </Tabs>
             </div>
           </div>
           <div className="bg-gradient-to-r from-yellow-400/50 to-orange-600/30  from-amber-200/50 to-amber-900/30 to-orange-900/30 from-green-200/50 to-orange-600/80 to-blue-600/30 from-green-500/80"></div>
           <div className="fixed bottom-10 bg-black/30 p-2 rounded-md text-white w-full">
             <div className="flex flex-row gap-2">
-              <Button
-                color="primary"
-                variant="shadow"
-                onClick={() => toast("Hello, World!")}
-              >
-                View Cart
-              </Button>
+              <LoginPageForKiosk />
               <Button color="danger" variant="shadow">
                 Checkout
               </Button>
-              <Button color="success" variant="shadow">
+              <Button
+                color="success"
+                variant="shadow"
+                onClick={async () => {
+                  clearCart();
+                }}
+              >
                 New Session
               </Button>
               <Button color="secondary" variant="shadow">
                 Sync Cart
               </Button>
-              <Button color="warning" variant="shadow">
-                Add Item
-              </Button>
-              <Button color="default" variant="shadow">
-                Login
-              </Button>
+
+              <Cart cart={cart} />
             </div>
           </div>
         </CardBody>

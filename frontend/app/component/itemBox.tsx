@@ -13,13 +13,15 @@ import {
   useDisclosure,
   Switch,
 } from "@nextui-org/react";
+import { toast } from "react-toastify";
 import { AddOn } from "./MainPage/StartPage";
+import API_BASE_URL from "@/APIconfig";
 interface ItemBoxProps {
   title: string;
   imageUrl: string;
   price: number;
   className?: string;
-  onClick?: () => void;
+  onClk: () => void;
   description?: string;
   misc?: string;
   addOn?: AddOn[];
@@ -29,7 +31,7 @@ const ItemBox = ({
   imageUrl = "",
   price = 0,
   className = "bg-gradient-to-r from-blue-400/50 to-green-600/50",
-  onClick,
+  onClk,
   misc = "new",
   description = "a",
   addOn,
@@ -54,6 +56,48 @@ const ItemBox = ({
     ); // Calculate total cost of selected add-ons
     return price + selectedAddOnCost;
   };
+  const handleAddToCart = async () => {
+    const selectedAddOnData = selectedAddOns.map((addon) => ({
+      name: addon.name,
+      id: addon.id,
+      price: addon.price,
+    }));
+    const totalQuantity = 1; // Assuming default quantity of 1 for the item
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/item/cart`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // Add any necessary authorization headers if applicable
+        },
+        body: JSON.stringify({
+          title, // Item title
+          imageUrl, // Item image URL
+          price: calculateTotalPrice(), // Total price with add-ons
+          quantity: totalQuantity, // Total quantity (potentially include add-on quantities)
+          addOnIds: selectedAddOnData, // Array of selected add-on IDs
+        }),
+      });
+
+      if (response.status === 200) {
+        toast.success("Item added to cart successfully!");
+        onClose(); // Close the modal after successful addition
+      } else {
+        console.error("Failed to add item to cart:", response.statusText);
+        toast.error(
+          "An error occurred while adding the item to cart. Please try again."
+        );
+      }
+    } catch (error) {
+      console.error("Error adding item to cart:", error);
+      toast.error(
+        "An error occurred while adding the item to cart. Please try again."
+      );
+    }
+    onClk(); // Trigger the parent component's onClick handler to re-render the list of items
+  };
+
   return (
     <div
       className={`w-full max-w-sm  ${className} border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700`}
@@ -119,7 +163,12 @@ const ItemBox = ({
                 <Button color="danger" variant="light" onPress={onClose}>
                   Cancel
                 </Button>
-                <Button color="primary" onPress={onClose}>
+                <Button
+                  color="primary"
+                  onPress={() => {
+                    handleAddToCart();
+                  }}
+                >
                   Add to Cart
                 </Button>
               </ModalFooter>
@@ -139,7 +188,9 @@ const ItemBox = ({
             {title}
           </h5>
         </a>
-        <div className="flex items-center mt-2.5 mb-5">{description.slice(0, 120)}</div>
+        <div className="flex items-center mt-2.5 mb-5">
+          {description.slice(0, 120)}
+        </div>
         <div className="flex items-center justify-between">
           <span className="text-3xl font-bold text-gray-900 dark:text-white">
             ₹{price}
