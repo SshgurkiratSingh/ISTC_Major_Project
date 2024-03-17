@@ -119,3 +119,18 @@ body {
     transform: scaleY(0.5);
   }
 }
+/* Width */
+*::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+*::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.767);
+}
+
+/* Handle */
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(155, 155, 155, 0.253);
+  border-radius: 5px;
+}
