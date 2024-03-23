@@ -25,16 +25,18 @@ interface ItemBoxProps {
   description?: string;
   misc?: string;
   addOn?: AddOn[];
+  category?: string;
 }
 const ItemBox = ({
   title = "",
   imageUrl = "",
   price = 0,
   className = "bg-gradient-to-r from-blue-400/50 to-green-600/50",
+  category = "",
   onClk,
   misc = "new",
   description = "a",
-  addOn,
+  addOn = [],
 }: ItemBoxProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -61,6 +63,8 @@ const ItemBox = ({
       name: addon.name,
       id: addon.id,
       price: addon.price,
+      quantity: 1, // Assuming default quantity of 1 for the add-on
+      url: addon.url,
     }));
     const totalQuantity = 1; // Assuming default quantity of 1 for the item
 
@@ -74,6 +78,11 @@ const ItemBox = ({
         body: JSON.stringify({
           title, // Item title
           imageUrl, // Item image URL
+          description, // Item description
+          misc, // Item misc info
+          className, // Item class
+          category,
+          itemPrice: price,
           price: calculateTotalPrice(), // Total price with add-ons
           quantity: totalQuantity, // Total quantity (potentially include add-on quantities)
           addOnIds: selectedAddOnData, // Array of selected add-on IDs
@@ -95,19 +104,19 @@ const ItemBox = ({
         "An error occurred while adding the item to cart. Please try again."
       );
     }
-    onClk(); // Trigger the parent component's onClick handler to re-render the list of items
+    onClk();
   };
 
   return (
     <div
-      className={`w-full max-w-sm  ${className} border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700`}
+      className={`w-full max-w-sm  ${className} border border-gray-200 group rounded-lg shadow dark:bg-gray-800 dark:border-gray-700`}
     >
       <Modal
         closeButton
         aria-labelledby="modal-title"
-        isOpen={title == "Frenc Fries" ? true : isOpen}
+        isOpen={title == "Garic Bread" ? true : isOpen}
         onClose={onClose}
-        className="dark min-w-[50%]"
+        className="dark min-w-[50%] group"
         backdrop="blur"
       >
         <ModalContent>
@@ -123,8 +132,12 @@ const ItemBox = ({
                   width={360}
                   className="min-w-[40%]"
                 />
-
-                {addOn !== null && (
+                {addOn?.length == 0 && (
+                  <div className="flex flex-col gap-1 min-w-[30%] items-center justify-center max-w-[55%]">
+                    <h3 className="text-md gap-1 max-w-[70%]">{description}</h3>
+                  </div>
+                )}
+                {addOn?.length > 0 && (
                   <div className="flex flex-col gap-1 min-w-[30%] items-center justify-center max-w-[55%]">
                     <div>
                       <h3 className="text-md gap-1">{description}</h3>
@@ -133,7 +146,7 @@ const ItemBox = ({
                     {addOn?.map((item) => (
                       <div
                         key={item.id || item.name} // Add unique key for each item (recommended)
-                        className="flex flex-row gap-1 items-center justify-center min-w-[100px] w-max"
+                        className="grid grid-cols-4 gap-1 items-center justify-center min-w-[100px] max-w-[250px]"
                       >
                         <Image
                           src={`/food${item.url}`}
@@ -176,21 +189,22 @@ const ItemBox = ({
           )}
         </ModalContent>
       </Modal>
-      <div className="relative top-2 left-4">
+      <div className="relative top-2 left-4 ">
         <Chip className="p-2">{misc}</Chip>
       </div>
 
       <img className="p-8 rounded-full" src={imageUrl} alt="product image" />
 
-      <div className="px-5 pb-5">
+      <div className="px-5 pb-5 ">
         <a href="#">
           <h5 className="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">
             {title}
           </h5>
         </a>
-        <div className="flex items-center mt-2.5 mb-5">
-          {description.slice(0, 120)}
-        </div>
+        {/* <div className="group-hover:flex hover:opacity-100 transition duration-250 ease-in-out items-center mt-2.5 mb-5 hidden">
+          {description.slice(0, 300)}
+        </div> */}
+
         <div className="flex items-center justify-between">
           <span className="text-3xl font-bold text-gray-900 dark:text-white">
             ₹{price}

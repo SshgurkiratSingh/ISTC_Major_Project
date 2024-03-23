@@ -6,6 +6,33 @@ const cors = require("cors");
 const { PrismaClient } = require("@prisma/client");
 
 const prisma = new PrismaClient();
+let tableStatus = [0, 0, 0];
+router.get("/cart/checkOut", (req, res) => {
+  const availableTableIndex = tableStatus.findIndex((status) => status === 0);
+
+  if (availableTableIndex !== -1) {
+    tableStatus[availableTableIndex] = 1; // Mark the table as occupied
+    orderQuence.push({
+      tableNumber: availableTableIndex + 1,
+      order: cart,
+      date: new Date(),
+      estimatedTime: 30 * 60 * 1000,
+      status: "pending",
+      currentStatus: "ordered",
+      paymentStatus: "pending",
+      paymentMethod: "cash",
+      completed: false,
+      rating: null,
+    });
+    res.json(orderQuence[orderQuence.length - 1]); // Send the table number as response
+    cart = []; // Clear the cart after checkout
+    console.log(orderQuence);
+  } else {
+    res.status(400).json({ error: "No tables available" });
+  }
+});
+const orderQuence = [];
+
 router.get("/", async (req, res) => {
   const data = await prisma.foodItem.findMany({
     include: {
@@ -25,7 +52,8 @@ function groupByCategory(data) {
 
     // If the category doesn't exist yet, create an empty array for it
     if (!categorizedData[category]) {
-      categorizedData[category] = [];
+      // Check if the category exists
+      categorizedData[category] = []; // Create the array
     }
 
     // Push the item into its corresponding category array
@@ -35,6 +63,7 @@ function groupByCategory(data) {
   // Return the object with categories as keys and items as values
   return categorizedData;
 }
+
 router.get("/cart", (req, res) => {
   res.send(cart);
 });
@@ -54,4 +83,11 @@ router.post("/updateCart", (req, res) => {
   cart = newCart;
   res.json({ message: "Cart updated" });
 });
+router.delete("/cart/:id", (req, res) => {
+  const id = req.params.id;
+  // remove the item with index id
+  cart.splice(id, 1);
+  res.json({ message: "Item removed from cart" });
+});
+
 module.exports = router;

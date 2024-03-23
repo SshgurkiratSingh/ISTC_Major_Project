@@ -29,6 +29,12 @@ router.get("/login", (req, res) => {
   console.log(authorizeURL);
   res.send(authorizeURL);
 });
+router.get("/login1", (req, res) => {
+  const scopes = ["user-read-playback-state", "user-modify-playback-state"];
+  const authorizeURL = spotify.createAuthorizeURL(scopes, "yourStateValue");
+  console.log(authorizeURL);
+  res.redirect(authorizeURL);
+});
 router.get("/currentQueue", (req, res) => {
   spotify.getMyCurrentPlayingTrack().then(
     function (data) {

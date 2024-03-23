@@ -6,16 +6,23 @@ interface Props {
   link?: string;
 }
 const NowPlaying = (
-  { title, artist, link }: Props = { title: "", artist: "", link: "" }
+  { title, artist, link }: Props = {
+    title: "",
+    artist: "",
+    link: "http://localhost:2500/api/v1/spotify/login",
+  }
 ) => {
   return (
     <div className="recent-track bg-blue-900/10 p-2 rounded-lg">
-      <div className="recent-track__icon">
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
+      <a href={link}>
+        {" "}
+        <div className="recent-track__icon">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </a>
       <div className="recent-track__body js-track text-xl text-gray-500">
         <a href={link}>
           <h4 className="recent-track__name font-semibold">{title}</h4>

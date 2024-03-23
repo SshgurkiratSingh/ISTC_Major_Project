@@ -182,6 +182,10 @@ const HomePage = () => {
               <NowPlaying
                 title={currentPlaying.title}
                 artist={currentPlaying.artist}
+                link={
+                  currentPlaying.link ||
+                  "http://localhost:2500/api/v1/spotify/login1"
+                }
               />
             </div>
           </div>
@@ -226,9 +230,7 @@ const HomePage = () => {
           <div className="fixed bottom-10 bg-black/30 p-2 rounded-md text-white w-full">
             <div className="flex flex-row gap-2">
               <LoginPageForKiosk />
-              <Button color="danger" variant="shadow">
-                Checkout
-              </Button>
+
               <Button
                 color="success"
                 variant="shadow"
@@ -242,7 +244,7 @@ const HomePage = () => {
                 Sync Cart
               </Button>
 
-              <Cart cart={cart} />
+              <Cart cart={cart} onRemove={refreshCart} />
             </div>
           </div>
         </CardBody>

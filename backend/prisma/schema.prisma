@@ -18,7 +18,7 @@ model FoodItem {
   name        String
   misc        String?  @default("new")
   description String?
-  className   String? 
+  className   String?
   price       Float
   category    String
   available   Boolean  @default(true)
@@ -36,4 +36,11 @@ model AddOn {
 
   FoodItem   FoodItem? @relation(fields: [foodItemId], references: [id])
   foodItemId String?   @db.ObjectId
+}
+
+model UserCart {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  phoneNumber String  @unique
+  rfidUID     String?
+  cart        Json[]
 }
