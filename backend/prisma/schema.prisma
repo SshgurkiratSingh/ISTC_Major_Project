@@ -41,6 +41,8 @@ model AddOn {
 model UserCart {
   id          String  @id @default(auto()) @map("_id") @db.ObjectId
   phoneNumber String  @unique
-  rfidUID     String?
+  name        String?
+  rfidUID     String? @unique
   cart        Json[]
+  createdAt   DateTime @default(now())
 }

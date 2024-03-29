@@ -53,11 +53,11 @@ export interface CartItem {
   imageUrl: string;
   price: number;
   quantity: number;
-  addOnIds?: AddOn[]; // Optional array of add-on objects (can be null)
+  addOnIds?: AddOn[]; // Optional array of AddOn objects
 }
 
 // Assuming your top-level structure is an object with category names as keys and arrays of FoodItems as values
-interface MenuData {
+export interface MenuData {
   [category: string]: FoodItem[];
 }
 

@@ -26,6 +26,8 @@ app.use("/api/v1/spotify/", apiForSpotify);
 const apiForItemList = require("./routes/itemListRoute");
 app.use("/api/v1/item/", apiForItemList); 
 
+const apiForUser = require("./routes/userRoute");
+app.use("/api/v1/user/", apiForUser);
 
 app.listen(port, "0.0.0.0", () => {
   console.log(`Server is online at port ${port}!`);
