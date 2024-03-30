@@ -39,10 +39,26 @@ model AddOn {
 }
 
 model UserCart {
-  id          String  @id @default(auto()) @map("_id") @db.ObjectId
-  phoneNumber String  @unique
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  phoneNumber String   @unique
   name        String?
-  rfidUID     String? @unique
+  rfidUID     String?  @unique
   cart        Json[]
   createdAt   DateTime @default(now())
+}
+
+model Order {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  tableNumber   Int
+  order         Json
+  date          DateTime @default(now())
+  estimatedTime Int
+  status        String   @default("pending")
+  currentStatus String   @default("ordered")
+  paymentStatus String   @default("pending")
+  paymentMethod String   @default("cash")
+  completed     Boolean  @default(false)
+  rating        Int?
+  mobileNumber  String? // Optional, if linking to a UserCart
+  createdAt     DateTime @default(now())
 }

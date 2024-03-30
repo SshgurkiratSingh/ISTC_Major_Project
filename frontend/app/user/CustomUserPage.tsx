@@ -52,6 +52,7 @@ import API_BASE_URL from "@/APIconfig";
 import UserInfoCard from "../component/InfoCard";
 import { CartItem, MenuData } from "../component/MainPage/StartPage";
 import ItemBox from "../component/itemBox";
+import { CheckoutPage } from "./[tableID]/CheckoutPage";
 interface CustomUserPageProps {
   tableId: string;
 }
@@ -63,6 +64,11 @@ export default function CustomUserPage({ tableId }: CustomUserPageProps) {
   const [cart, setCart] = useState<FoodItem[]>([]);
   const [itemData, setItemData] = useState<MenuData>();
   const [isLoading, setIsLoading] = useState(false);
+  const [checkoutModalOpen, setCheckoutModalOpen] = useState(false);
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [orderId, setOrderId] = useState("");
+  const [upiImage, setUpiImage] = useState("");
+
   const [selectedAddOns, setSelectedAddOns] = useState<{
     [itemId: string]: string[];
   }>({}); // Object to map item IDs to selected add-on IDs
@@ -95,6 +101,60 @@ export default function CustomUserPage({ tableId }: CustomUserPageProps) {
 
     fetchData();
   }, []);
+
+  const handleCheckout = async () => {
+    if (cart.length === 0) {
+      toast.error("Cart is empty! Add an item to continue");
+      return;
+    }
+
+    try {
+      const checkoutUrl = `${API_BASE_URL}/api/v1/user/table/checkOut`;
+
+      const response = await fetch(checkoutUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // Include any necessary authorization headers
+        },
+        body: JSON.stringify({
+          tableNumber: tableId,
+          items: cart,
+          totalPrice: cart.reduce((a, b) => a + b.price, 0),
+          paymentMethod: "upi",
+          mobileNumber,
+          // ...other data
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(`API request failed with status ${response.status}`);
+      }
+
+      const data = await response.json();
+      setOrderId("Order Placed"); // Assuming the API returns an order ID
+
+      // Generate UPI QR code
+      // upiqr({
+      //   payeeVPA: "your_upi_vpa", // Replace with your UPI VPA
+      //   payeeName: "Your Name", // Replace with your name
+      //   amount: String(cart.reduce((a, b) => a + b.price, 0)),
+      //   transactionNote: "ISTC MAJOR PROJECT",
+      //   transactionRefUrl: "https://your_website_url", // Replace with your website URL
+      // })
+      //   .then((upi) => {
+      //     setUpiImage(upi.qr);
+      //     setCheckoutModalOpen(false);
+      //     setPaymentModalOpen(true);
+      //   })
+      //   .catch((err) => {
+      //     console.log(err);
+      //     toast.error("Error generating UPI QR code.");
+      //   });
+    } catch (error) {
+      console.error("Error during checkout:", error);
+      toast.error("An error occurred during checkout. Please try again.");
+    }
+  };
 
   const refreshCart = async () => {
     if (!mobileNumber) return; // Don't refresh if no mobile number is set
@@ -237,9 +297,12 @@ export default function CustomUserPage({ tableId }: CustomUserPageProps) {
   return (
     <div className="min-h-[100vh] flex-col items-center justify-between text-white p-4 ">
       <div className="fixed right-1 z-10  top-[50vh] ">
+        <CheckoutPage cart={cart} mobileNumber={mobileNumber} table={tableId} />
         <Popover placement="bottom" showArrow={true}>
           <PopoverTrigger>
-            <Button>Cart</Button>
+            <Button color="secondary" variant="shadow">
+              Cart
+            </Button>
           </PopoverTrigger>
           <PopoverContent className="bg-gray-800/50 p-4 rounded-md">
             {cart !== undefined && cart !== null ? (
@@ -262,9 +325,7 @@ export default function CustomUserPage({ tableId }: CustomUserPageProps) {
                             alt={item.title}
                           />
                         )}
-                        <span>
-                          {item.title} x {item.quantity}
-                        </span>
+                        <span>{item.title} x </span>
                       </div>
                       {/* Calculate and display item price */}
                       <span>₹{item.price * item.quantity}</span>
