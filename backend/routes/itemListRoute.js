@@ -251,7 +251,7 @@ router.put("/orders/:id/payment-status", async (req, res) => {
   try {
     const updatedOrder = await prisma.order.update({
       where: { id: req.params.id },
-      data: { status: newStatus },
+      data: { paymentStatus: newStatus },
     });
     res.json(updatedOrder);
   } catch (error) {
@@ -320,7 +320,7 @@ router.get("/orders/reports", async (req, res) => {
 
   try {
     const whereClause = {
-      status: "completed", // Only consider completed orders
+      // Only consider completed orders
     };
 
     if (startDate && endDate) {
@@ -333,10 +333,8 @@ router.get("/orders/reports", async (req, res) => {
     switch (reportType) {
       case "sales":
         const salesReport = await prisma.order.aggregate({
-          where: whereClause,
           _sum: {
             // Replace 'subtotal' with the field representing an item's total
-            subtotal: true,
           },
         });
         res.json(salesReport);

@@ -36,6 +36,7 @@ import Image from "next/image";
 import { toast } from "react-toastify";
 import { stringify } from "querystring";
 import Loading from "@/app/component/Loading";
+import { useRouter } from "next/navigation";
 
 interface UserCart {
   id: string;
@@ -172,7 +173,7 @@ function OrderHistory() {
       handleRefresh();
     }
   };
-
+  const Router = useRouter();
   return (
     <div className="min-h-[80vh] flex-col items-center justify-between p-4 bg-black text-white bg-gradient-to-tl from-amber-500/80 to-purple-800/70">
       <Card
@@ -184,14 +185,39 @@ function OrderHistory() {
         <CardHeader className="pb-2 pt-0 px-4  flex-col items-start text-white">
           <h2 className="text-2xl font-bold">Order History</h2>
           <Divider className="my-2 bg-white" />
-          <Button
-            className=" text-white m-2"
-            onClick={handleRefresh}
-            variant="bordered"
-            color="secondary"
-          >
-            Refresh
-          </Button>{" "}
+          <div>
+            <Button
+              className=" text-white m-2"
+              onClick={handleRefresh}
+              variant="bordered"
+              color="secondary"
+              disabled={isLoading}
+            >
+              Refresh
+            </Button>{" "}
+            <Button
+              className=" text-white m-2"
+              onClick={() => {
+                Router.push("/admin");
+              }}
+              variant="bordered"
+              color="secondary"
+              disabled={isLoading}
+            >
+              Admin Page
+            </Button>{" "}
+            <Button
+              className=" text-white m-2"
+              onClick={() => {
+                Router.push("/admin/users");
+              }}
+              variant="bordered"
+              color="secondary"
+              disabled={isLoading}
+            >
+              Order History Page
+            </Button>{" "}
+          </div>
           <div className="mb-4 flex gap-4">
             <Input
               placeholder="Search Mobile Number..."
@@ -372,7 +398,7 @@ function OrderHistory() {
                 <ModalHeader className=" text-white">
                   <div>Order Details</div>
                 </ModalHeader>
-                <ModalBody className=" text-white">
+                <ModalBody className=" text-white bg-black/20">
                   {selectedOrder && (
                     <>
                       <div>
@@ -393,15 +419,15 @@ function OrderHistory() {
                         <span className="font-bold">Order Status:</span>{" "}
                         <Chip
                           color={
-                            selectedOrder.currentStatus === "Completed"
+                            selectedOrder.status === "completed"
                               ? "success"
-                              : selectedOrder.currentStatus === "Pending"
+                              : selectedOrder.status === "Pending"
                               ? "warning"
                               : "danger"
                           }
                           variant="flat"
                         >
-                          {selectedOrder.currentStatus}
+                          {selectedOrder.status}
                         </Chip>
                       </div>
                       <div>
@@ -414,7 +440,7 @@ function OrderHistory() {
                         <span className="font-bold">Payment Status:</span>{" "}
                         <Chip
                           color={
-                            selectedOrder.paymentStatus === "Paid"
+                            selectedOrder.paymentStatus === "paid"
                               ? "success"
                               : "danger"
                           }
@@ -505,8 +531,49 @@ function OrderHistory() {
                 </ModalBody>
                 <ModalFooter className=" text-white">
                   <Button
+                    onClick={() => {
+                      axios
+                        .put(
+                          `${API_BASE_URL}/api/v1/item/orders/${selectedOrder?.id}/payment-status`,
+                          {
+                            status: "paid",
+                          }
+                        )
+                        .then(() => {
+                          toast.success("Order marked as paid successfully");
+                          onClose();
+                          handleRefresh();
+                        })
+                        .catch((err) => {
+                          toast.error(String(err));
+                        });
+                    }}
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-md"
+                  >
+                    Mark as Paid
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      axios
+                        .delete(
+                          `${API_BASE_URL}/api/v1/item/orders/${selectedOrder?.id}`
+                        )
+                        .then(() => {
+                          toast.success("Order canceled successfully");
+                          onClose();
+                          handleRefresh();
+                        })
+                        .catch((err) => {
+                          toast.error(String(err));
+                        });
+                    }}
+                    className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-md"
+                  >
+                    Cancel Order
+                  </Button>
+                  <Button
                     onClick={handleCloseModal}
-                    className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-md"
+                    className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md"
                   >
                     Close
                   </Button>

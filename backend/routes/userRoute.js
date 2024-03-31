@@ -41,7 +41,6 @@ router.get("/rfid/:id", async (req, res) => {
   }
 });
 router.post("/cart/mobile/:mobile", async (req, res) => {
-  
   try {
     const updatedUser = await prisma.userCart.update({
       where: { phoneNumber: req.params.mobile },
@@ -74,6 +73,91 @@ router.post("/users", async (req, res) => {
   } catch (error) {
     // You can add specific error handling for validation errors here
     res.status(500).json({ error: error.message });
+  }
+});
+router.put("/users/:id", async (req, res) => {
+  try {
+    const userId = req.params.id; // Assuming the user ID is in the route
+    const { name } = req.body;
+
+    if (!name) {
+      return res.status(400).json({ error: "Name is required" });
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { name },
+    });
+
+    res.json(updatedUser);
+  } catch (error) {
+    if (error.code === "P2025") {
+      res.status(404).json({ error: "User not found" });
+    } else {
+      res.status(500).json({ error: error.message });
+    }
+  }
+});
+router.delete("/users/:id", async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    await prisma.user.delete({
+      where: { id: userId },
+    });
+
+    res.status(204).send(); // 204 No Content - successful deletion
+  } catch (error) {
+    if (error.code === "P2025") {
+      res.status(404).json({ error: "User not found" });
+    } else {
+      res.status(500).json({ error: error.message });
+    }
+  }
+});
+router.get("/users/:id/cart", async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        userCart: true, // Include the related userCart data
+      },
+    });
+
+    if (user) {
+      res.json(user.userCart);
+    } else {
+      res.status(404).json({ error: "User not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+router.put("/users/:id/rfid", async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const { newRfidUID } = req.body;
+
+    if (!newRfidUID) {
+      return res.status(400).json({ error: "newRfidUID is required" });
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        userCart: { update: { rfidUID: newRfidUID } },
+      },
+    });
+
+    res.json(updatedUser);
+  } catch (error) {
+    if (error.code === "P2025") {
+      res.status(404).json({ error: "User not found" });
+    } else {
+      res.status(500).json({ error: error.message });
+    }
   }
 });
 

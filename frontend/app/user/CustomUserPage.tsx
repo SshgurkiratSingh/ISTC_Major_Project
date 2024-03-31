@@ -22,7 +22,7 @@ interface FoodItem {
   id: string;
 }
 
-interface APIData {
+export interface APIData {
   id: string;
   phoneNumber: string;
   name: string;
