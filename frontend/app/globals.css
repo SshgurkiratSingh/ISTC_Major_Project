@@ -144,8 +144,7 @@ font-weight: bolder;
   overflow: hidden;
   background: linear-gradient(90deg, #0babea, #d41c1c, #ff7504b7, #a200ffc4);
   background-repeat: no-repeat;
-  background-size: 83%;
-  animation: animate 4s linear infinite;
+  background-size: 100%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: rgba(255, 255, 255, 0);
 }

@@ -8,16 +8,16 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 let tableStatus = [0, 0, 0];
 router.get("/cart/checkOut", async (req, res) => {
-  const availableTableIndex = tableStatus.findIndex(
-    (status) => status === undefined
-  );
+  const availableTableIndex = tableStatus.findIndex((status) => status === 0);
 
   if (availableTableIndex !== -1) {
     try {
       const newOrder = await prisma.order.create({
         data: {
           tableNumber: availableTableIndex + 1,
-          order: cart,
+          order: {
+            cart: cart,
+          },
           date: new Date(),
           estimatedTime: 30 * 60 * 1000,
           status: "pending",
@@ -160,16 +160,22 @@ router.get("/orders", async (req, res) => {
   const status = req.query.status; // Filter by status (optional)
   const skip = parseInt(req.query.skip) || 0;
   const take = parseInt(req.query.take) || 10;
+  const sortBy = req.query.sortBy; // Optional sorting field
+  const sortOrder = req.query.sortOrder || "desc"; // Optional sorting order
 
   try {
     const where = status ? { status } : {};
+
+    // Build the orderBy clause based on query parameters
+    const orderBy = sortBy ? { [sortBy]: sortOrder } : { createdAt: "desc" }; // Default sorting
 
     const orders = await prisma.order.findMany({
       where,
       skip,
       take,
-      orderBy: { createdAt: "desc" }, // Example: Order by creation date
+      orderBy,
     });
+
     res.json(orders);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -245,7 +251,7 @@ router.put("/orders/:id/payment-status", async (req, res) => {
   try {
     const updatedOrder = await prisma.order.update({
       where: { id: req.params.id },
-      data: { paymentStatus: newStatus },
+      data: { status: newStatus },
     });
     res.json(updatedOrder);
   } catch (error) {
