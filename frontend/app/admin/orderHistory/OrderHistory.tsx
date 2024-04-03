@@ -76,8 +76,10 @@ function OrderHistory() {
   const [filterOrderId, setFilterOrderId] = useState("");
   const [filterMobileNumber, setFilterMobileNumber] = useState("");
   const [filterTableNumber, setFilterTableNumber] = useState("");
-  const filteredOrders = orders.filter(
-    (order) =>
+  const [showPendingOnly, setShowPendingOnly] = useState(false);
+
+  const filteredOrders = orders.filter((order) => {
+    const matchesFilters =
       (filterOrderId === "" ||
         order.id.toLowerCase().includes(filterOrderId.toLowerCase())) &&
       (filterMobileNumber === "" ||
@@ -87,8 +89,11 @@ function OrderHistory() {
             .toLowerCase()
             .includes(filterMobileNumber.toLowerCase()))) &&
       (filterTableNumber === "" ||
-        order.tableNumber === parseInt(filterTableNumber))
-  );
+        order.tableNumber === parseInt(filterTableNumber));
+
+    // Only include pending orders if the toggle is active
+    return matchesFilters && (!showPendingOnly || order.status !== "completed");
+  });
 
   const handleRefresh = async () => {
     setIsLoading(true);
@@ -215,7 +220,7 @@ function OrderHistory() {
               color="secondary"
               disabled={isLoading}
             >
-              Order History Page
+              User List Page
             </Button>{" "}
           </div>
           <div className="mb-4 flex gap-4">
@@ -258,6 +263,14 @@ function OrderHistory() {
                 Table 3
               </SelectItem>
             </Select>
+            <Button
+              className=" text-white m-2 w-52"
+              onClick={() => setShowPendingOnly((prev) => !prev)}
+              variant="bordered"
+              color="secondary"
+            >
+              {showPendingOnly ? "Show All" : "Show Pending"}
+            </Button>
           </div>
         </CardHeader>
         <Divider />
@@ -278,6 +291,7 @@ function OrderHistory() {
             <TableColumn className="px-4 py-2">Actions</TableColumn>
             <TableColumn className="px-4 py-2">Ordered Using</TableColumn>
             <TableColumn className="px-4 py-2">Item List</TableColumn>
+            <TableColumn className="px-4 py-2">Payment Status</TableColumn>
           </TableHeader>
           <TableBody className="bg-gray-700 text-white">
             {filteredOrders.map((order) => (
@@ -379,6 +393,17 @@ function OrderHistory() {
                         .reduce((a, b) => a + b, 0)}
                     </Button>
                   </Tooltip>
+                </TableCell>
+                <TableCell className="px-4 py-2">
+                  {order.paymentStatus == "paid" ? (
+                    <Chip color="success" variant="flat">
+                      Paid
+                    </Chip>
+                  ) : (
+                    <Chip color="warning" variant="flat">
+                      Not Paid
+                    </Chip>
+                  )}
                 </TableCell>
               </TableRow>
             ))}
@@ -530,28 +555,30 @@ function OrderHistory() {
                   )}
                 </ModalBody>
                 <ModalFooter className=" text-white">
-                  <Button
-                    onClick={() => {
-                      axios
-                        .put(
-                          `${API_BASE_URL}/api/v1/item/orders/${selectedOrder?.id}/payment-status`,
-                          {
-                            status: "paid",
-                          }
-                        )
-                        .then(() => {
-                          toast.success("Order marked as paid successfully");
-                          onClose();
-                          handleRefresh();
-                        })
-                        .catch((err) => {
-                          toast.error(String(err));
-                        });
-                    }}
-                    className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-md"
-                  >
-                    Mark as Paid
-                  </Button>
+                  {selectedOrder?.paymentStatus !== "paid" && (
+                    <Button
+                      onClick={() => {
+                        axios
+                          .put(
+                            `${API_BASE_URL}/api/v1/item/orders/${selectedOrder?.id}/payment-status`,
+                            {
+                              status: "paid",
+                            }
+                          )
+                          .then(() => {
+                            toast.success("Order marked as paid successfully");
+                            onClose();
+                            handleRefresh();
+                          })
+                          .catch((err) => {
+                            toast.error(String(err));
+                          });
+                      }}
+                      className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-md"
+                    >
+                      Mark as Paid
+                    </Button>
+                  )}
                   <Button
                     onClick={() => {
                       axios

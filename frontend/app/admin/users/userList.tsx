@@ -36,6 +36,7 @@ import { APIData } from "@/app/user/CustomUserPage";
 import { toast } from "react-toastify";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
+import UserDetailsModal from "./UserDetailModal";
 
 function UserList() {
   const [users, setUsers] = useState<APIData[]>([]);
@@ -46,22 +47,21 @@ function UserList() {
     setSelectedUser(user);
     onOpen();
   };
+  const fetchUsers = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/v1/user/users`);
+      setUsers(response.data);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      toast.error(String(error));
+      // Handle error appropriately (e.g., display an error message)
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      setIsLoading(true);
-      try {
-        const response = await axios.get(`${API_BASE_URL}/api/v1/user/users`);
-        setUsers(response.data);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-        toast.error(String(error));
-        // Handle error appropriately (e.g., display an error message)
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchUsers();
   }, []);
   const Router = useRouter();
@@ -79,7 +79,7 @@ function UserList() {
           <div>
             <Button
               className=" text-white m-2"
-              // onClick={handleRefresh}
+              onClick={fetchUsers}
               variant="bordered"
               color="secondary"
               disabled={isLoading}
@@ -160,62 +160,12 @@ function UserList() {
           </Table>
         </CardBody>
       </Card>{" "}
-      <Modal
+      <UserDetailsModal
         isOpen={isOpen}
         onClose={onClose}
-        backdrop="blur"
-        placement="top"
-        scrollBehavior="inside"
-        className="dark min-w-[80%]  bg-black/50 border "
-      >
-        <ModalContent className="bg-transparent">
-          {(onClose) => (
-            <>
-              <ModalHeader className=" text-white bg-black/40">
-                <div>User Details</div>
-              </ModalHeader>
-              <ModalBody className=" text-white bg-black/40">
-                {selectedUser && (
-                  <>
-                    <div>
-                      <span className="font-bold">User ID:</span>{" "}
-                      {selectedUser.id}
-                    </div>
-                    <div>
-                      <span className="font-bold">Phone Number:</span>{" "}
-                      {selectedUser.phoneNumber}
-                    </div>
-                    <div>
-                      <span className="font-bold">RFID UID:</span>{" "}
-                      {selectedUser.rfidUID || "Not Available"}
-                    </div>
-                    <div>
-                      <span className="font-bold">User Name:</span>{" "}
-                      {selectedUser.name || "Not Set"}
-                    </div>
-                    <div>
-                      <span className="font-bold">Created At:</span>{" "}
-                      {format(
-                        new Date(selectedUser.createdAt),
-                        "dd MMM yyyy hh:mm"
-                      ) || "Not Set"}
-                    </div>
-                    {/* Add more details as needed */}
-                  </>
-                )}
-              </ModalBody>
-              <ModalFooter className=" text-white">
-                <Button
-                  onClick={onClose}
-                  className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md"
-                >
-                  Close
-                </Button>
-              </ModalFooter>{" "}
-            </>
-          )}
-        </ModalContent>
-      </Modal>
+        selectedUser={selectedUser}
+        refreshUsers={fetchUsers}
+      />
     </div>
   );
 }

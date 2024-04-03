@@ -66,7 +66,7 @@ router.get("/users", async (req, res) => {
 router.post("/users", async (req, res) => {
   try {
     // Assuming required fields like 'phoneNumber' and potentially 'name' are present in req.body
-    const newUser = await prisma.user.create({
+    const newUser = await prisma.userCart.create({
       data: req.body,
     });
     res.json(newUser);
@@ -84,7 +84,7 @@ router.put("/users/:id", async (req, res) => {
       return res.status(400).json({ error: "Name is required" });
     }
 
-    const updatedUser = await prisma.user.update({
+    const updatedUser = await prisma.userCart.update({
       where: { id: userId },
       data: { name },
     });
@@ -95,6 +95,7 @@ router.put("/users/:id", async (req, res) => {
       res.status(404).json({ error: "User not found" });
     } else {
       res.status(500).json({ error: error.message });
+      console.log(error);
     }
   }
 });
@@ -102,7 +103,7 @@ router.delete("/users/:id", async (req, res) => {
   try {
     const userId = req.params.id;
 
-    await prisma.user.delete({
+    await prisma.userCart.delete({
       where: { id: userId },
     });
 
@@ -119,7 +120,7 @@ router.get("/users/:id/cart", async (req, res) => {
   try {
     const userId = req.params.id;
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.userCart.findUnique({
       where: { id: userId },
       include: {
         userCart: true, // Include the related userCart data
@@ -144,10 +145,10 @@ router.put("/users/:id/rfid", async (req, res) => {
       return res.status(400).json({ error: "newRfidUID is required" });
     }
 
-    const updatedUser = await prisma.user.update({
+    const updatedUser = await prisma.userCart.update({
       where: { id: userId },
       data: {
-        userCart: { update: { rfidUID: newRfidUID } },
+        rfidUID: newRfidUID,
       },
     });
 
@@ -158,6 +159,19 @@ router.put("/users/:id/rfid", async (req, res) => {
     } else {
       res.status(500).json({ error: error.message });
     }
+  }
+});
+router.get("/users/history/:mobile", async (req, res) => {
+  const mobileNumber = req.params.mobile;
+
+  try {
+    const userHistory = await prisma.order.findMany({
+      where: { mobileNumber },
+    });
+
+    res.json(userHistory);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
