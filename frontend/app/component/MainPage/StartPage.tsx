@@ -14,7 +14,7 @@ import ItemBox from "../itemBox";
 import Cart from "./Cart";
 import LoginPageForKiosk from "./Login";
 import { useEffect, useState } from "react";
-import API_BASE_URL from "@/APIconfig";
+import API_BASE_URL from "@/APIconfig";import { motion, AnimatePresence } from "framer-motion";
 // import toast, { toastConfig } from "react-simple-toasts";
 import "react-simple-toasts/dist/theme/ocean-wave.css";
 import { Bounce, ToastContainer, toast } from "react-toastify";
@@ -165,91 +165,125 @@ const HomePage = () => {
 
     fetchCurrentPlaying();
   }, []);
+  
   return (
-    <div className=" min-h-[80vh] flex-col items-center justify-between  text-white p-4 ">
-      <Card
-        className="py-4 bg-black/30 min-h-screen min-w-24"
-        style={{ backdropFilter: "blur(25px)" }}
+    <AnimatePresence>
+      <motion.div
+        className="min-h-[80vh] flex-col items-center justify-between text-white p-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.5 }}
       >
-        <CardHeader className="pb-2 pt-0 px-4  flex-col items-start">
-          <div className="flex flex-row justify-between items-start gap-1 w-full gradHead">
-            <div>
-              <h4 className="font-bold text-large text-gray-400">
-                Collaborative Kitchen
-              </h4>
-            </div>
-            <div>
-              <NowPlaying
-                title={currentPlaying.title}
-                artist={currentPlaying.artist}
-                link={
-                  currentPlaying.link ||
-                  "http://localhost:2500/api/v1/spotify/login1"
-                }
-              />
-            </div>
-          </div>
-          <Divider className="my-2 h-0.5 bg-white" />
-        </CardHeader>
-        <CardBody className="overflow-visible py-2">
-          <div className="w-full flex flex-row  items-center gap-2 bg-black px-2 dark">
-            <div className="flex w-full flex-col">
-              <Tabs
-                aria-label="Options"
-                variant="bordered"
-                color="secondary"
-                radius="full"
+        <Card
+          className="py-4 bg-black/30 min-h-screen min-w-24"
+          style={{ backdropFilter: "blur(25px)" }}
+        >
+          <CardHeader className="pb-2 pt-0 px-4 flex-col items-start">
+            <motion.div
+              className="flex flex-row justify-between items-start gap-1 w-full gradHead"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <div>
+                <h4 className="font-bold text-large text-gray-400">
+                  Collaborative Kitchen
+                </h4>
+              </div>
+              <div>
+                <NowPlaying
+                  title={currentPlaying.title}
+                  artist={currentPlaying.artist}
+                  link={
+                    currentPlaying.link ||
+                    "http://localhost:2500/api/v1/spotify/login1"
+                  }
+                />
+              </div>
+            </motion.div>
+            <Divider className="my-2 h-0.5 bg-white" />
+          </CardHeader>
+          <CardBody className="overflow-visible py-2">
+            <div className="w-full flex flex-row items-center gap-2 bg-black px-2 dark">
+              <motion.div
+                className="flex w-full flex-col"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
               >
-                {Object.keys(itemData ?? {}).map((category) => (
-                  <Tab key={category} title={category}>
-                    <Card className=" duration-150 animate-appearance-in ">
-                      <CardBody className="flex flex-row gap-5">
-                        {itemData?.[category]?.map((item) => (
-                          <ItemBox
-                            key={item.id}
-                            title={item.name}
-                            imageUrl={`/food/${item.imageUrl}`}
-                            price={item.price}
-                            misc={item.misc}
-                            description={item.description}
-                            className={item.className}
-                            addOn={item.addOns}
-                            onClk={() => {
-                              refreshCart();
-                            }}
-                          />
-                        ))}
-                      </CardBody>
-                    </Card>
-                  </Tab>
-                ))}
-              </Tabs>
+                <Tabs
+                  aria-label="Options"
+                  variant="bordered"
+                  color="secondary"
+                  radius="full"
+                >
+                  {Object.keys(itemData ?? {}).map((category) => (
+                    <Tab key={category} title={category}>
+                      <Card className=" duration-150 animate-appearance-in">
+                        <CardBody className="flex flex-row gap-5">
+                          <AnimatePresence>
+                            {itemData?.[category]?.map((item) => (
+                              <motion.div
+                                key={item.id}
+                                initial={{ opacity: 0, scale: 0.5 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.5 }}
+                                transition={{ duration: 0.3 }}
+                              >
+                                <ItemBox
+                                  title={item.name}
+                                  imageUrl={`/food/${item.imageUrl}`}
+                                  price={item.price}
+                                  misc={item.misc}
+                                  description={item.description}
+                                  className={item.className}
+                                  addOn={item.addOns}
+                                  onClk={() => {
+                                    refreshCart();
+                                  }}
+                                />
+                              </motion.div>
+                            ))}
+                          </AnimatePresence>
+                        </CardBody>
+                      </Card>
+                    </Tab>
+                  ))}
+                </Tabs>
+              </motion.div>
             </div>
-          </div>
-          <div className="bg-gradient-to-r from-yellow-400/50 to-orange-600/30  from-amber-200/50 to-amber-900/30 to-orange-900/30 from-green-200/50 to-orange-600/80 to-blue-600/30 from-green-500/80"></div>
-          <div className="fixed bottom-10 bg-black/30 p-2 rounded-md text-white w-full">
-            <div className="flex flex-row gap-2">
-              <LoginPageForKiosk />
+            <div className="bg-gradient-to-r from-yellow-400/50 to-orange-600/30  from-amber-200/50 to-amber-900/30 to-orange-900/30 from-green-200/50 to-orange-600/80 to-blue-600/30 from-green-500/80"></div>
+            <motion.div
+              className="fixed bottom-10 bg-black/30 p-2 rounded-md text-white w-full"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+            >
+              <div className="flex flex-row gap-2">
+                <LoginPageForKiosk />
 
-              <Button
-                color="success"
-                variant="shadow"
-                onClick={async () => {
-                  clearCart();
-                }}
-              >
-                New Session
-              </Button>
-              <Button color="secondary" variant="shadow">
-                Sync Cart
-              </Button>
+                <Button
+                  color="success"
+                  variant="shadow"
+                  onClick={async () => {
+                    clearCart();
+                  }}
+                >
+                  New Session
+                </Button>
+                <Button color="secondary" variant="shadow">
+                  Sync Cart
+                </Button>
 
-              <Cart cart={cart} onRemove={refreshCart} />
-            </div>
-          </div>
-        </CardBody>
-      </Card>
-    </div>
+                <Cart cart={cart} onRemove={refreshCart} />
+              </div>
+            </motion.div>
+          </CardBody>
+        </Card>
+      </motion.div>
+    </AnimatePresence>
   );
 };
+
 export default HomePage;

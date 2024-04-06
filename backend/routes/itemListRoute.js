@@ -334,7 +334,7 @@ router.get("/orders/reports", async (req, res) => {
       case "sales":
         const salesReport = await prisma.order.aggregate({
           _sum: {
-            // Replace 'subtotal' with the field representing an item's total
+            totalPrice: true, // Replace 'totalPrice' with your actual field name
           },
         });
         res.json(salesReport);
