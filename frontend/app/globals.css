@@ -20,7 +20,7 @@ body {
   color: rgb(var(--foreground-rgb));
   /* background: url("/back2.webp") no-repeat; */
   background: rgb(174,183,238);
- background: linear-gradient(167deg, rgb(7, 13, 48) , rgb(36, 14, 43), rgb(5, 47, 107) );
+ background: linear-gradient(167deg, rgb(67, 128, 17) , rgb(131, 26, 163), rgb(5, 47, 107) );
 
   background-color: rgb(var(--background-end-rgb));
   background-size: cover;
@@ -142,9 +142,9 @@ font-weight: bolder;
   font-size: 1.3em;
   letter-spacing: 4px;
   overflow: hidden;
-  background: linear-gradient(90deg, #0babea, #d41c1c, #ff7504b7, #a200ffc4);
+  background: linear-gradient(90deg, #0babea, #d4c81c, #ff7504b7, #a200ffc4);
   background-repeat: no-repeat;
-  background-size: 100%;
+ 
   -webkit-background-clip: text;
   -webkit-text-fill-color: rgba(255, 255, 255, 0);
 }
@@ -166,3 +166,44 @@ font-weight: bolder;
 .custom-select-item {
   color: black !important; /* or any color that you like */
 }
+.neon-glass-effect {
+  background-color: rgba(255, 255, 255, 0.1); /* semi-transparent white background */
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.2); /* light border for more glass effect */
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(18, 2, 252, 0.5),
+               0 0 20px rgba(3, 131, 131, 0.5),
+               0 0 30px rgba(0, 26, 255, 0.774),
+               0 0 40px rgba(0, 0, 255, 0.5),   
+               0 0 70px rgba(0, 0, 255, 0.5),   
+               0 0 80px rgba(0, 0, 255, 0.5);   
+ 
+  /* animation: animated-shadow 10s linear infinite; */
+
+}
+
+@keyframes animated-border {
+  0% {
+    border-image: radial-gradient(circle farthest-corner at center center, #121FCF 49%, #CF1512 100%);
+    
+
+    border-image-slice: 1;
+    
+  }
+  100% {
+    border-image: linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%);
+
+    border-image-slice: 1;
+    
+  }
+}
+
+.animated-border {
+  animation: animated-border 10s linear infinite;
+  border: 3px solid; /* Use a solid border as a fallback for browsers that don't support border images */
+  padding: 5px;
+  color: #fff; /* Change as needed */
+  
+}
+
+  

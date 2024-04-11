@@ -14,7 +14,8 @@ import ItemBox from "../itemBox";
 import Cart from "./Cart";
 import LoginPageForKiosk from "./Login";
 import { useEffect, useState } from "react";
-import API_BASE_URL from "@/APIconfig";import { motion, AnimatePresence } from "framer-motion";
+import API_BASE_URL from "@/APIconfig";
+import { motion, AnimatePresence } from "framer-motion";
 // import toast, { toastConfig } from "react-simple-toasts";
 import "react-simple-toasts/dist/theme/ocean-wave.css";
 import { Bounce, ToastContainer, toast } from "react-toastify";
@@ -50,6 +51,8 @@ export interface AddOn {
 }
 export interface CartItem {
   title: string;
+  description?: string;
+  misc?: string;
   imageUrl: string;
   price: number;
   quantity: number;
@@ -62,14 +65,11 @@ export interface MenuData {
 }
 
 const HomePage = () => {
+  const [user, setUser] = useState<any>(null);
   const clearCart = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/v1/item/clearCart`, {
         method: "GET",
-        headers: {
-          // Add any necessary headers for authentication or authorization (if applicable)
-          // "Authorization": `Bearer ${accessToken}`, // Example for token-based auth
-        },
       });
 
       if (response.status === 200) {
@@ -89,15 +89,41 @@ const HomePage = () => {
       );
     }
   };
+  const fetchUser = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/item/loggedin`, {
+        method: "GET",
+      });
+
+      if (response.status === 200) {
+        const newUserData = await response.json();
+
+        if (JSON.stringify(newUserData) !== JSON.stringify(user)) {
+          setUser(newUserData);
+          // toast.success("User data refreshed successfully!");
+        } else {
+          console.log("User data is up-to-date.");
+        }
+      } else {
+        console.error("Failed to fetch user data:", response.statusText);
+        setUser(null);
+        // toast.error("Error fetching user data. Please try again later.");
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+  useEffect(() => {
+    setInterval(() => {
+      fetchUser();
+    }, 5000);
+  }, []);
 
   const refreshCart = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/v1/item/cart`, {
         method: "GET",
-        headers: {
-          // Add any necessary headers for authentication or authorization (if applicable)
-          // "Authorization": `Bearer ${accessToken}`, // Example for token-based auth
-        },
+        headers: {},
       });
 
       if (response.status === 200) {
@@ -165,7 +191,7 @@ const HomePage = () => {
 
     fetchCurrentPlaying();
   }, []);
-  
+
   return (
     <AnimatePresence>
       <motion.div
@@ -261,7 +287,7 @@ const HomePage = () => {
               transition={{ duration: 0.5, delay: 0.6 }}
             >
               <div className="flex flex-row gap-2">
-                <LoginPageForKiosk />
+                <LoginPageForKiosk loggedIn={user?.cart} />
 
                 <Button
                   color="success"
@@ -272,7 +298,15 @@ const HomePage = () => {
                 >
                   New Session
                 </Button>
-                <Button color="secondary" variant="shadow">
+                <Button
+                  color="secondary"
+                  variant="shadow"
+                  onClick={() => {
+                    fetch(`${API_BASE_URL}/api/v1//item/cart/syncCart`, {});
+                    refreshCart();
+                  }}
+                  disabled={!user?.cart}
+                >
                   Sync Cart
                 </Button>
 

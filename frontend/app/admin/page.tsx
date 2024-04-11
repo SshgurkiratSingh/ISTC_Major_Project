@@ -25,6 +25,29 @@ export default function Home() {
               exit={{ opacity: 0, y: 50 }}
               transition={{ duration: 0.5 }}
             >
+              {" "}
+              <Link href="/">
+                <motion.p
+                  className="text-white hover:text-gray-300 transition-colors duration-300"
+                  whileHover={{
+                    scale: 1.1,
+                    transition: { duration: 0.2 },
+                  }}
+                >
+                  Home Page
+                </motion.p>
+              </Link>
+              <Link href="/admin/tableStatus">
+                <motion.p
+                  className="text-white hover:text-gray-300 transition-colors duration-300"
+                  whileHover={{
+                    scale: 1.1,
+                    transition: { duration: 0.2 },
+                  }}
+                >
+                  Table Status
+                </motion.p>
+              </Link>
               <Link href="/admin/users">
                 <motion.p
                   className="text-white hover:text-gray-300 transition-colors duration-300"
@@ -45,17 +68,6 @@ export default function Home() {
                   }}
                 >
                   Order History Page
-                </motion.p>
-              </Link>
-              <Link href="/">
-                <motion.p
-                  className="text-white hover:text-gray-300 transition-colors duration-300"
-                  whileHover={{
-                    scale: 1.1,
-                    transition: { duration: 0.2 },
-                  }}
-                >
-                  Home Page
                 </motion.p>
               </Link>
               <Link href="/user/1">

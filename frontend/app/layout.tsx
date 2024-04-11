@@ -6,8 +6,8 @@ import ClientOnly from "./clientOnly";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: "ISTC MINOR PROJECT",
-  description: "Website made by students of ISTC for Minor Project",
+  title: "ISTC Major Project",
+  description: "Collaborative Kitchen",
 };
 
 export default function RootLayout({

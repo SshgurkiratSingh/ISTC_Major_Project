@@ -47,7 +47,7 @@ interface UserCart {
   createdAt: string; // ISO 8601 formatted date string
 }
 
-interface Order {
+export interface Order {
   id: string;
   tableNumber: number;
   order: UserCart; // Replace with the actual type of the order data

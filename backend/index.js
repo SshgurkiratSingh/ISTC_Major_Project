@@ -24,10 +24,13 @@ const apiForSpotify = require("./routes/spotifyRoutes");
 app.use("/api/v1/spotify/", apiForSpotify);
 
 const apiForItemList = require("./routes/itemListRoute");
-app.use("/api/v1/item/", apiForItemList); 
+app.use("/api/v1/item/", apiForItemList);
 
 const apiForUser = require("./routes/userRoute");
 app.use("/api/v1/user/", apiForUser);
+
+const apiForMqtt = require("./routes/mqttData");
+app.use("/api/v1/mqtt/", apiForMqtt);
 
 app.listen(port, "0.0.0.0", () => {
   console.log(`Server is online at port ${port}!`);

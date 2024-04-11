@@ -6,9 +6,31 @@ const cors = require("cors");
 const { PrismaClient } = require("@prisma/client");
 
 const prisma = new PrismaClient();
-let tableStatus = [0, 0, 0];
+let tableStatus = [[], [], []];
+function isTableAvailable(tableNumber) {
+  const index = tableNumber - 1;
+  return !tableStatus[index] || tableStatus[index].length === 0;
+}
+// Purpose: Check out the cart and create a new order
+
+function isTableAvailable(tableNumber) {
+  const index = tableNumber - 1;
+  return !tableStatus[index] || tableStatus[index].length === 0;
+}
+router.get("/", async (req, res) => {
+  const data = await prisma.foodItem.findMany({
+    include: {
+      addOns: true, // Include the "addOns" relation in the query
+    },
+  });
+
+  res.send(groupByCategory(data));
+});
+
 router.get("/cart/checkOut", async (req, res) => {
-  const availableTableIndex = tableStatus.findIndex((status) => status === 0);
+  const availableTableIndex = tableStatus.findIndex(
+    (status) => status.length === 0
+  );
 
   if (availableTableIndex !== -1) {
     try {
@@ -28,7 +50,7 @@ router.get("/cart/checkOut", async (req, res) => {
         },
       });
 
-      tableStatus[availableTableIndex] = newOrder.id; // Store the order ID
+      tableStatus[availableTableIndex].push(newOrder.id); // Add the order ID to the table
       res.json(newOrder);
       cart = []; // Clear the cart
     } catch (error) {
@@ -48,6 +70,8 @@ router.post("/table/checkOut", async (req, res) => {
     res.status(400).json({ error: "Missing required fields" });
     return;
   }
+
+
   try {
     const order = await prisma.userCart.findUnique({
       where: {
@@ -71,7 +95,8 @@ router.post("/table/checkOut", async (req, res) => {
       },
     });
 
-    tableStatus[tableNumber - 1] = newOrder.id; // Store the order ID
+    const index = tableNumber - 1;
+    tableStatus[index].push(newOrder.id); // Add the order ID to the table
 
     await prisma.userCart.update({
       where: {
@@ -89,16 +114,112 @@ router.post("/table/checkOut", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
-router.get("/", async (req, res) => {
-  const data = await prisma.foodItem.findMany({
-    include: {
-      addOns: true, // Include the "addOns" relation in the query
-    },
-  });
-
-  res.send(groupByCategory(data));
+// Route 1: Get the status of all tables
+router.get("/tables/status", (req, res) => {
+  res.json(tableStatus);
 });
+// Route 2: Get the status of a specific table
+router.get("/tables/:tableNumber/status", (req, res) => {
+  const tableNumber = parseInt(req.params.tableNumber);
+  if (tableNumber < 1 || tableNumber > tableStatus.length) {
+    res.status(400).json({ error: "Invalid table number" });
+    return;
+  }
+  res.json(tableStatus[tableNumber - 1]);
+});
+router.delete("/tables/:tableNumber/status", async (req, res) => {
+  const tableNumber = parseInt(req.params.tableNumber);
+  if (tableNumber < 1 || tableNumber > tableStatus.length) {
+    res.status(400).json({ error: "Invalid table number" });
+    return;
+  }
+
+  try {
+    const orderIds = tableStatus[tableNumber - 1];
+    for (const orderId of orderIds) {
+      await prisma.order.delete({ where: { id: orderId } });
+    }
+    tableStatus[tableNumber - 1] = [];
+    res.json({ message: "Table status cleared successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+router.put("/tables/:tableNumber/status", async (req, res) => {
+  const tableNumber = parseInt(req.params.tableNumber);
+  const newStatus = req.body.status;
+
+  if (tableNumber < 1 || tableNumber > tableStatus.length) {
+    res.status(400).json({ error: "Invalid table number" });
+    return;
+  }
+
+  if (!Array.isArray(newStatus)) {
+    res.status(400).json({ error: "Status must be an array" });
+    return;
+  }
+
+  try {
+    tableStatus[tableNumber - 1] = newStatus;
+    res.json({ message: "Table status updated successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+router.get("/tables/:tableNumber/orders", async (req, res) => {
+  const tableNumber = parseInt(req.params.tableNumber);
+  if (tableNumber < 1 || tableNumber > tableStatus.length) {
+    res.status(400).json({ error: "Invalid table number" });
+    return;
+  }
+
+  try {
+    const orderIds = tableStatus[tableNumber - 1];
+    const orders = await prisma.order.findMany({
+      where: { id: { in: orderIds } },
+    });
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+router.put("/tables/:tableNumber/orders/complete", async (req, res) => {
+  const tableNumber = parseInt(req.params.tableNumber);
+  if (tableNumber < 1 || tableNumber > tableStatus.length) {
+    res.status(400).json({ error: "Invalid table number" });
+    return;
+  }
+
+  try {
+    const orderIds = tableStatus[tableNumber - 1];
+    await prisma.order.updateMany({
+      where: { id: { in: orderIds } },
+      data: { status: "completed" },
+    });
+    tableStatus[tableNumber - 1] = [];
+    res.json({ message: "All orders for the table marked as completed" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+router.get("/tables/:tableNumber/orders/count", async (req, res) => {
+  const tableNumber = parseInt(req.params.tableNumber);
+  if (tableNumber < 1 || tableNumber > tableStatus.length) {
+    res.status(400).json({ error: "Invalid table number" });
+    return;
+  }
+
+  try {
+    const orderIds = tableStatus[tableNumber - 1];
+    const ordersCount = await prisma.order.count({
+      where: { id: { in: orderIds } },
+    });
+    res.json({ count: ordersCount });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 let cart = [];
 /**
  * Groups the input data by category.
@@ -372,5 +493,42 @@ router.get("/orders/reports", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
+let userLoggedIn = null;
+router.get("/loggedin", async (req, res) => {
+  if (userLoggedIn !== null) {
+    res.json(userLoggedIn);
+  } else {
+    res.status(404).json({ error: "User not found" });
+  }
+});
+router.delete("/logout", async (req, res) => {
+  userLoggedIn = null;
+  res.status(200).json({ message: "User logged out successfully" });
+});
+router.post("/login", async (req, res) => {
+  const { rfidUID } = req.body;
+  const user = await prisma.userCart.findUnique({
+    where: { rfidUID },
+  });
+  if (user) {
+    userLoggedIn = user;
+    res.json({
+      status: 200,
+      message: "User logged in successfully",
+    });
+  } else {
+    res.status(404).json({ error: "User not found" });
+  }
+});
+router.get("/cart/syncCart", async (req, res) => {
+  if (userLoggedIn) {
+    userLoggedIn = await prisma.userCart.findUnique({
+      where: { rfidUID: userLoggedIn.rfidUID },
+    });
+    res.json(userLoggedIn);
+    cart = userLoggedIn.cart;
+  } else {
+    res.status(404).json({ error: "User not loggedIn" });
+  }
+});
 module.exports = router;

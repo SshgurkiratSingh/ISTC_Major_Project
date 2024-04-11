@@ -38,8 +38,8 @@ export interface Order {
 
   date: string; // ISO 8601 date string format is recommended
   estimatedTime: string; // Same as above
-  status: string; // Consider using an enum for order statuses
-  currentStatus: string;
+  status: string;
+  currentStatus: string; 
   paymentStatus: string;
   paymentMethod: string;
   completed: boolean;

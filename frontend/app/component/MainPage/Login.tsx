@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Card,
   Modal,
@@ -12,12 +12,51 @@ import {
   useDisclosure,
   Switch,
 } from "@nextui-org/react";
-const LoginPageForKiosk = () => {
+import API_BASE_URL from "@/APIconfig";
+import { toast } from "react-toastify";
+import { on } from "events";
+interface LoginPageForKioskProps {
+  loggedIn: boolean;
+}
+const LoginPageForKiosk = ({ loggedIn }: LoginPageForKioskProps) => {
   const { isOpen, onClose, onOpen } = useDisclosure();
+  useEffect(() => {
+    if (loggedIn) {
+      onClose();
+      // toast.success("Already logged in");
+    }
+  }, [loggedIn]);
+  const onButtonPressed = () => {
+    if (loggedIn) {
+      try {
+        fetch(`${API_BASE_URL}/api/v1/item/logout`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({}),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+            toast.success("Logout successful");
+            onClose();
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            toast.error(String(error));
+          });
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      onOpen();
+    }
+  };
   return (
     <div>
-      <Button color="default" variant="shadow" onClick={onOpen}>
-        Login
+      <Button color="default" variant="shadow" onClick={onButtonPressed}>
+        {loggedIn ? "Logout" : "Login "}
       </Button>
       <Modal
         closeButton
