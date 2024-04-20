@@ -109,7 +109,7 @@ const ItemBox = ({
 
   return (
     <div
-      className={`w-full max-w-sm  ${className} border border-gray-200 group rounded-lg shadow dark:bg-gray-800 dark:border-gray-700`}
+      className={`w-full max-w-sm  ${className} border border-gray-200 group rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 max-h-[70vhj]`}
     >
       <Modal
         closeButton
@@ -189,29 +189,43 @@ const ItemBox = ({
           )}
         </ModalContent>
       </Modal>
-      <div className="relative top-2 left-4 ">
-        <Chip className="p-2">{misc}</Chip>
-      </div>
-
-      <img className="p-8 rounded-full" src={imageUrl} alt="product image" />
-
-      <div className="px-5 pb-5 ">
-        <a href="#">
-          <h5 className="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">
-            {title}
-          </h5>
-        </a>
-        {/* <div className="group-hover:flex hover:opacity-100 transition duration-250 ease-in-out items-center mt-2.5 mb-5 hidden">
-          {description.slice(0, 300)}
-        </div> */}
-
-        <div className="flex items-center justify-between">
-          <span className="text-3xl font-bold text-gray-900 dark:text-white">
-            ₹{price}
-          </span>
-          <Button color="warning" onPress={onOpen}>
-            Customise
-          </Button>
+      <div className="relative flex items-center justify-center">
+        <div className="absolute top-4 left-4 z-10">
+          <Chip
+            className={`${className} px-4 py-2 rounded-full text-sm font-semibold text-white shadow-lg`}
+            style={{ textShadow: "0 2px 4px rgba(0, 0, 0, 0.2)" }}
+          >
+            {misc}
+          </Chip>
+        </div>
+        <div className="w-full max-w-xs mx-auto overflow-hidden rounded-3xl shadow-2xl">
+          <img
+            className="w-full object-cover h-64"
+            src={imageUrl}
+            alt="product image"
+          />
+          <div className={`px-6 py-4 ${className} `}>
+            <a
+              href="#"
+              className="hover:text-indigo-600 transition-colors duration-300"
+            >
+              <h5 className="text-xl font-bold tracking-tight text-gray-900">
+                {title}
+              </h5>
+            </a>
+            <div className="mt-4 flex items-center justify-between">
+              <span className="text-4xl font-extrabold text-indigo-600">
+                ₹{price}
+              </span>
+              <Button
+                color="warning"
+                onPress={onOpen}
+                className="px-6 py-2 rounded-full text-white bg-gradient-to-r from-orange-500 to-yellow-500 shadow-lg hover:from-orange-600 hover:to-yellow-600 transition-colors duration-300"
+              >
+                Customise
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

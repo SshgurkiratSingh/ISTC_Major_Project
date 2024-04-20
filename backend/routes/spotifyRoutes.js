@@ -38,7 +38,7 @@ router.get("/login1", (req, res) => {
 router.get("/currentQueue", (req, res) => {
   spotify.getMyCurrentPlayingTrack().then(
     function (data) {
-      console.log("Now playing: " + data.body.item.name);
+      // console.log("Now playing: " + data.body.item.name);
       res.json(data);
     },
     function (err) {

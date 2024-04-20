@@ -231,7 +231,7 @@ const HomePage = () => {
             <Divider className="my-2 h-0.5 bg-white" />
           </CardHeader>
           <CardBody className="overflow-visible py-2">
-            <div className="w-full flex flex-row items-center gap-2 bg-black px-2 dark">
+            <div className="w-full flex flex-row items-center gap-2 bg-black px-2 dark py-2 rounded-md">
               <motion.div
                 className="flex w-full flex-col"
                 initial={{ opacity: 0, y: 20 }}
@@ -243,74 +243,81 @@ const HomePage = () => {
                   variant="bordered"
                   color="secondary"
                   radius="full"
+                  className="w-full"
                 >
-                  {Object.keys(itemData ?? {}).map((category) => (
-                    <Tab key={category} title={category}>
-                      <Card className=" duration-150 animate-appearance-in">
-                        <CardBody className="flex flex-row gap-5">
-                          <AnimatePresence>
-                            {itemData?.[category]?.map((item) => (
-                              <motion.div
-                                key={item.id}
-                                initial={{ opacity: 0, scale: 0.5 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.5 }}
-                                transition={{ duration: 0.3 }}
-                              >
-                                <ItemBox
-                                  title={item.name}
-                                  imageUrl={`/food/${item.imageUrl}`}
-                                  price={item.price}
-                                  misc={item.misc}
-                                  description={item.description}
-                                  className={item.className}
-                                  addOn={item.addOns}
-                                  onClk={() => {
-                                    refreshCart();
-                                  }}
-                                />
-                              </motion.div>
-                            ))}
-                          </AnimatePresence>
-                        </CardBody>
-                      </Card>
-                    </Tab>
-                  ))}
+                  {Object.keys(itemData ?? {})
+                    .reverse()
+                    .map((category) => (
+                      <Tab key={category} title={category}>
+                        <Card className=" duration-150 animate-appearance-in max-h-[70vh]">
+                          <CardBody className="flex flex-row gap-4">
+                            <AnimatePresence>
+                              {itemData?.[category]?.map((item) => (
+                                <motion.div
+                                  key={item.id}
+                                  initial={{ opacity: 0, scale: 0.5 }}
+                                  animate={{ opacity: 1, scale: 1 }}
+                                  exit={{ opacity: 0, scale: 0.5 }}
+                                  transition={{ duration: 0.3 }}
+                                >
+                                  <ItemBox
+                                    title={item.name}
+                                    imageUrl={`/food/${item.imageUrl}`}
+                                    price={item.price}
+                                    misc={item.misc}
+                                    description={item.description}
+                                    className={item.className}
+                                    addOn={item.addOns}
+                                    onClk={() => {
+                                      refreshCart();
+                                    }}
+                                  />
+                                </motion.div>
+                              ))}
+                            </AnimatePresence>
+                          </CardBody>
+                        </Card>
+                      </Tab>
+                    ))}
                 </Tabs>
               </motion.div>
             </div>
             <div className="bg-gradient-to-r from-yellow-400/50 to-orange-600/30  from-amber-200/50 to-amber-900/30 to-orange-900/30 from-green-200/50 to-orange-600/80 to-blue-600/30 from-green-500/80"></div>
             <motion.div
-              className="fixed bottom-10 bg-black/30 p-2 rounded-md text-white w-full"
+              className="fixed bottom-5 left-[10%]  -translate-x-1/2 bg-gradient-to-r from-black/60 via-gray-800/80 to-black/60 backdrop-blur-lg rounded-3xl shadow-2xl text-white w-11/12 max-w-4xl flex items-center justify-center px-12 py-2"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.6 }}
             >
-              <div className="flex flex-row gap-2">
-                <LoginPageForKiosk loggedIn={user?.cart} />
-
-                <Button
-                  color="success"
-                  variant="shadow"
-                  onClick={async () => {
-                    clearCart();
-                  }}
-                >
-                  New Session
-                </Button>
-                <Button
-                  color="secondary"
-                  variant="shadow"
-                  onClick={() => {
-                    fetch(`${API_BASE_URL}/api/v1//item/cart/syncCart`, {});
-                    refreshCart();
-                  }}
-                  disabled={!user?.cart}
-                >
-                  Sync Cart
-                </Button>
-
-                <Cart cart={cart} onRemove={refreshCart} />
+              <div className="w-full flex justify-center">
+                <div className="flex flex-row gap-4 items-center">
+                  <LoginPageForKiosk loggedIn={user?.cart} />
+                  <Button
+                    color="success"
+                    variant="shadow"
+                    onClick={async () => {
+                      clearCart();
+                    }}
+                    className="px-6 py-3 rounded-full text-white bg-gradient-to-r from-green-500 to-green-700 shadow-lg hover:from-green-600 hover:to-green-800 transition-colors duration-300"
+                  >
+                    New Session
+                  </Button>
+                  <Button
+                    color="secondary"
+                    variant="shadow"
+                    onClick={() => {
+                      fetch(`${API_BASE_URL}/api/v1//item/cart/syncCart`, {});
+                      refreshCart();
+                    }}
+                    disabled={!user?.cart}
+                    className={`px-6 py-3 rounded-full text-white bg-gradient-to-r from-blue-500 to-indigo-700 shadow-lg hover:from-blue-600 hover:to-indigo-800 transition-colors duration-300 ${
+                      !user?.cart ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                  >
+                    Sync Cart
+                  </Button>
+                  <Cart cart={cart} onRemove={refreshCart} />
+                </div>
               </div>
             </motion.div>
           </CardBody>

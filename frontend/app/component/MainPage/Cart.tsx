@@ -39,7 +39,7 @@ export interface Order {
   date: string; // ISO 8601 date string format is recommended
   estimatedTime: string; // Same as above
   status: string;
-  currentStatus: string; 
+  currentStatus: string;
   paymentStatus: string;
   paymentMethod: string;
   completed: boolean;
@@ -150,8 +150,13 @@ const Cart = ({ cart, onRemove }: CartProps) => {
   const pathname = usePathname();
 
   return (
-    <div>
-      <Button color="primary" variant="shadow" onClick={onOpen}>
+    <div className="dark">
+      <Button
+        disabled={cart.length === 0}
+        variant="shadow"
+        onClick={onOpen}
+        className="px-8 py-4 rounded-full text-white bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 shadow-lg hover:from-purple-700 hover:via-indigo-700 hover:to-blue-700 transition-colors duration-300"
+      >
         View Cart - ₹{cart.reduce((a, b) => a + b.price, 0)}
       </Button>
       <AnimatePresence>
@@ -160,22 +165,22 @@ const Cart = ({ cart, onRemove }: CartProps) => {
           onOpenChange={onOpenChange}
           scrollBehavior="inside"
           classNames={{
-            body: "py-6 ",
-            backdrop: "bg-[#292f46]/50 backdrop-opacity-40",
-            base: "border-[#292f46] bg-gradient-to-b  from-red-500 to-purple-800 text-[#a8b0d3] min-w-[60%]",
-            header: "border-b-[1px] border-[#292f46]",
-            footer: "border-t-[1px] border-[#292f46]",
-            closeButton: "hover:bg-white/5 active:bg-white/10",
+            body: "py-6",
+            backdrop: "bg-black/60 backdrop-blur-sm",
+            base: "border border-gray-700 bg-gray-800 rounded-2xl shadow-xl",
+            header: "border-b border-gray-700",
+            footer: "border-t border-gray-700",
+            closeButton: "hover:bg-gray-700 active:bg-gray-600",
           }}
           backdrop="blur"
         >
           <ModalContent>
             {(onClose) => (
               <>
-                <ModalHeader className="flex flex-col gap-1 text-black">
+                <ModalHeader className="flex flex-col gap-1 text-gray-200 font-bold px-6 py-4">
                   {topText}
                 </ModalHeader>
-                <ModalBody>
+                <ModalBody className="px-6 py-4">
                   {step === STEPS.CARTPAGE && (
                     <motion.div
                       initial={{ opacity: 0, scale: 0.8 }}
@@ -192,26 +197,23 @@ const Cart = ({ cart, onRemove }: CartProps) => {
                               animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0, y: -20 }}
                               transition={{ duration: 0.3 }}
+                              className="mb-4"
                             >
                               <Card
                                 isBlurred
-                                className="border-none bg-white/10 dark:bg-default-100/50 m-1"
-                                shadow="sm"
+                                className="bg-gray-700 rounded-lg shadow-md overflow-hidden"
                               >
-                                <CardBody className="grid grid-row-2 gap-2 p-2 text-white/90">
-                                  <h4 className="font-bold text-large ">
-                                    {item.title}
-                                  </h4>
-                                  <div className="flex flex-col-3 gap-2 items-center justify-between">
-                                    <Image
-                                      src={item.imageUrl}
-                                      width={80}
-                                      height={80}
-                                    />
+                                <CardBody className="grid grid-cols-3 gap-4 p-4">
+                                  <div className="col-span-2 flex flex-col justify-between">
+                                    <h4 className="font-bold text-lg text-gray-200">
+                                      {item.title}
+                                    </h4>
                                     <div>
                                       {item.addOnIds &&
                                         item.addOnIds.length > 0 && (
-                                          <b>Add-ons:</b>
+                                          <p className="font-semibold text-gray-400 mb-2">
+                                            Add-ons:
+                                          </p>
                                         )}
                                       {item.addOnIds &&
                                         item.addOnIds.map((addOnId) => (
@@ -221,15 +223,23 @@ const Cart = ({ cart, onRemove }: CartProps) => {
                                             animate={{ opacity: 1, x: 0 }}
                                             exit={{ opacity: 0, x: 20 }}
                                             transition={{ duration: 0.3 }}
+                                            className="text-gray-400"
                                           >
-                                            <div>{addOnId.name}</div>
+                                            {addOnId.name}
                                           </motion.div>
                                         ))}
                                     </div>
-
-                                    <div className="flex flex-row gap-2 items-center">
+                                  </div>
+                                  <div className="flex flex-col items-center justify-between">
+                                    <Image
+                                      src={item.imageUrl}
+                                      width={80}
+                                      height={80}
+                                      className="rounded-full"
+                                    />
+                                    <div className="flex flex-row items-center gap-2">
                                       <motion.span
-                                        className="text-lg font-bold"
+                                        className="text-xl font-bold text-gray-200"
                                         initial={{ opacity: 0, scale: 0.8 }}
                                         animate={{ opacity: 1, scale: 1 }}
                                         exit={{ opacity: 0, scale: 0.8 }}
@@ -239,7 +249,7 @@ const Cart = ({ cart, onRemove }: CartProps) => {
                                       </motion.span>
                                       <Button
                                         size="sm"
-                                        color="danger"
+                                        color="warning"
                                         onClick={async () => {
                                           try {
                                             const response = await fetch(
@@ -273,7 +283,7 @@ const Cart = ({ cart, onRemove }: CartProps) => {
                                           }
                                           onRemove();
                                         }}
-                                        className="duration-150 animate-appearance-in font-bold text-sm"
+                                        className="px-4 py-2 rounded-full text-white bg-yellow-500 hover:bg-yellow-600 transition-colors duration-300 font-bold"
                                       >
                                         Remove
                                       </Button>
@@ -285,19 +295,25 @@ const Cart = ({ cart, onRemove }: CartProps) => {
                           ))}
                         </AnimatePresence>
                         <Divider />
+                        <Divider className="my-4" />
                         <motion.div
-                          className="flex flex-row justify-between"
+                          className="flex flex-row justify-between items-center"
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -20 }}
                           transition={{ duration: 0.3 }}
                         >
-                          <span>Total</span>
-                          <span>₹{cart.reduce((a, b) => a + b.price, 0)}</span>
+                          <span className="text-lg font-bold text-gray-200">
+                            Total
+                          </span>
+                          <span className="text-2xl font-bold text-gray-200">
+                            ₹{cart.reduce((a, b) => a + b.price, 0)}
+                          </span>
                         </motion.div>
                       </div>
                     </motion.div>
                   )}
+
                   {step === STEPS.PAYMENT && (
                     <motion.div
                       initial={{ opacity: 0, scale: 0.8 }}
@@ -378,14 +394,15 @@ const Cart = ({ cart, onRemove }: CartProps) => {
                     </motion.div>
                   )}
                 </ModalBody>
-                <ModalFooter>
+                <ModalFooter className="px-6 py-4 flex justify-between">
                   <Button
-                    color="danger"
+                    color="warning"
                     variant="light"
                     onPress={() => {
                       onClose();
                       setStep(STEPS.CARTPAGE);
                     }}
+                    className="px-6 py-3 rounded-full text-white bg-red-500 hover:bg-red-600 transition-colors duration-300 font-bold"
                   >
                     Close
                   </Button>
@@ -393,6 +410,9 @@ const Cart = ({ cart, onRemove }: CartProps) => {
                     color="primary"
                     onPress={onNext}
                     disabled={cart.length === 0}
+                    className={`px-6 py-3 rounded-full text-white bg-indigo-500 hover:bg-indigo-600 transition-colors duration-300 font-bold ${
+                      cart.length === 0 ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                   >
                     {buttonText}
                   </Button>

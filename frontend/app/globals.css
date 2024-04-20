@@ -20,7 +20,7 @@ body {
   color: rgb(var(--foreground-rgb));
   /* background: url("/back2.webp") no-repeat; */
   background: rgb(174,183,238);
- background: linear-gradient(167deg, rgb(67, 128, 17) , rgb(131, 26, 163), rgb(5, 47, 107) );
+ background: linear-gradient(167deg, rgba(255, 6, 6, 0.651) , rgb(131, 26, 163), rgb(5, 47, 107) );
 
   background-color: rgb(var(--background-end-rgb));
   background-size: cover;
