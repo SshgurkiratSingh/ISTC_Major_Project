@@ -55,6 +55,7 @@ router.get("/cart/checkOut", async (req, res) => {
       cart = []; // Clear the cart
     } catch (error) {
       res.status(500).json({ error: error.message });
+      console.log(error);
     }
   } else {
     res.status(400).json({ error: "No tables available" });
@@ -70,7 +71,6 @@ router.post("/table/checkOut", async (req, res) => {
     res.status(400).json({ error: "Missing required fields" });
     return;
   }
-
 
   try {
     const order = await prisma.userCart.findUnique({

@@ -182,46 +182,39 @@ function OrderHistory() {
   return (
     <div className="min-h-[80vh] flex-col items-center justify-between p-4 bg-black text-white bg-gradient-to-tl from-amber-500/80 to-purple-800/70">
       <Card
-        className="py-4 bg-black/30 min-h-screen min-w-24 rounded-xl"
+        className="py-4 bg-black/30 min-h-screen min-w-24  backdrop-blur-lg rounded-2xl shadow-2xl"
         style={{ backdropFilter: "blur(25px)" }}
       >
         {isLoading && <Loading />}
 
-        <CardHeader className="pb-2 pt-0 px-4  flex-col items-start text-white">
-          <h2 className="text-2xl font-bold">Order History</h2>
-          <Divider className="my-2 bg-white" />
-          <div>
+        <CardHeader className="pb-2 pt-0 px-4 flex flex-col items-start text-white">
+          <h2 className="text-3xl font-bold mb-2">Order History</h2>
+          <Divider className="my-2 bg-white/20" />
+          <div className="flex items-center gap-4 mb-4">
             <Button
-              className=" text-white m-2"
+              className="text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 transition-colors duration-300 rounded-full px-6 py-3 shadow-lg"
               onClick={handleRefresh}
-              variant="bordered"
-              color="secondary"
+              variant="flat"
               disabled={isLoading}
             >
               Refresh
-            </Button>{" "}
+            </Button>
             <Button
-              className=" text-white m-2"
-              onClick={() => {
-                Router.push("/admin");
-              }}
-              variant="bordered"
-              color="secondary"
+              className="text-white bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 transition-colors duration-300 rounded-full px-6 py-3 shadow-lg"
+              onClick={() => Router.push("/admin")}
+              variant="flat"
               disabled={isLoading}
             >
               Admin Page
-            </Button>{" "}
+            </Button>
             <Button
-              className=" text-white m-2"
-              onClick={() => {
-                Router.push("/admin/users");
-              }}
-              variant="bordered"
-              color="secondary"
+              className="text-white bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 transition-colors duration-300 rounded-full px-6 py-3 shadow-lg"
+              onClick={() => Router.push("/admin/users")}
+              variant="flat"
               disabled={isLoading}
             >
               User List Page
-            </Button>{" "}
+            </Button>
           </div>
           <div className="mb-4 flex gap-4">
             <Input
@@ -264,21 +257,20 @@ function OrderHistory() {
               </SelectItem>
             </Select>
             <Button
-              className=" text-white m-2 w-52"
+              className="text-white bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 transition-colors duration-300  px-6 py-3 shadow-lg"
               onClick={() => setShowPendingOnly((prev) => !prev)}
-              variant="bordered"
-              color="secondary"
+              variant="flat"
             >
-              {showPendingOnly ? "Show All" : "Show Pending"}
+              {showPendingOnly ? "Show All" : "Show Pend"}
             </Button>
           </div>
         </CardHeader>
-        <Divider />
+        <Divider className="my-2 bg-white/20" />
         <Table
           aria-label="Orders History Table"
           className="w-full dark text-white"
         >
-          <TableHeader className="bg-gray-800 text-white dark">
+          <TableHeader className="bg-black/30 text-white">
             <TableColumn className="px-4 py-2">Order ID</TableColumn>
             <TableColumn className="px-4 py-2">Customer Table</TableColumn>
             <TableColumn className="px-4 py-2">Order Date</TableColumn>
@@ -293,15 +285,19 @@ function OrderHistory() {
             <TableColumn className="px-4 py-2">Item List</TableColumn>
             <TableColumn className="px-4 py-2">Payment Status</TableColumn>
           </TableHeader>
-          <TableBody className="bg-gray-700 text-white">
+          <TableBody className="bg-black/30 text-white">
             {filteredOrders.map((order) => (
               <TableRow
                 key={order.id}
-                className="hover:bg-gray-600 transition-colors duration-300"
+                className="hover:bg-black/40 transition-colors duration-300"
               >
                 <TableCell className="px-4 py-2">{order.id}</TableCell>
                 <TableCell className="px-4 py-2">
-                  <Chip color="primary" variant="flat">
+                  <Chip
+                    color="primary"
+                    variant="flat"
+                    className="bg-purple-600/50 text-white"
+                  >
                     {order.tableNumber}
                   </Chip>
                 </TableCell>
@@ -309,6 +305,7 @@ function OrderHistory() {
                 <TableCell className="px-4 py-2">
                   {format(order.date, "yyyy-MM-dd HH:mm")}
                 </TableCell>
+
                 <TableCell className="px-4 py-2 min-w-[100px]  text-white">
                   <Select
                     className="text-white "
@@ -523,7 +520,11 @@ function OrderHistory() {
                               className="flex items-center gap-2"
                             >
                               <Image
-                                src={item.imageUrl}
+                                src={
+                                  item.imageUrl.includes("/food//")
+                                    ? item.imageUrl.replace(/\/\/+/g, "/")
+                                    : `${item.imageUrl}`
+                                }
                                 alt={item.title}
                                 width={50}
                                 height={50}
