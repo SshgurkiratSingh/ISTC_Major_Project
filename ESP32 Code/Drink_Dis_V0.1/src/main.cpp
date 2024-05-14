@@ -188,6 +188,8 @@ void loop()
       // Reset drink queue
       digitalWrite(drinkRelay[i], HIGH);
     }
+
+    int temp;
   }
   if (digitalRead(drinkQuenceButton) == LOW)
   {
@@ -208,7 +210,11 @@ void loop()
       }
     }
     // Reset drink queue
-    digitalWrite(drinkRelay[i], HIGH);
+    for (int i = 0; i < drinkCount; i++)
+    {
+      digitalWrite(drinkRelay[i], HIGH);
+    }
+
     drinkQueue = -1;
   }
 
