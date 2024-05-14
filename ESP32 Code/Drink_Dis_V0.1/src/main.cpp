@@ -3,8 +3,8 @@
 #include <WiFi.h>
 
 // WiFi and MQTT Setup
-char SSID[64] = "Node ";
-char PASSWORD[64] = "whyitellyou";
+char SSID[64] = "ConForNode1";
+char PASSWORD[64] = "12345678";
 
 // Drink Dispenser Setup
 #define drinkCount 4
@@ -155,7 +155,7 @@ void setup()
   Serial.println("Connected to WiFi");
 
   // Set up MQTT client
-  client.setServer("192.168.1.100", 1883); // Replace with your MQTT broker address and port
+  client.setServer("ec2-44-204-194-140.compute-1.amazonaws.com", 1883); // Replace with your MQTT broker address and port
   client.setCallback(handleMQTTMessage);
 }
 
