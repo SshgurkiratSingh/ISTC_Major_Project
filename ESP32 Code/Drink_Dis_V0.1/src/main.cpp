@@ -141,8 +141,8 @@ void setup()
   {
 
     pinMode(drinkRelay[i], OUTPUT);
-    digitalWrite(drinkRelay[i], LOW); // Relays off initially
-    pinMode(buttons[i], INPUT);       // Assuming buttons are connected with pull-up resistors
+    digitalWrite(drinkRelay[i], HIGH); // Relays off initially
+    pinMode(buttons[i], INPUT);        // Assuming buttons are connected with pull-up resistors
   }
 
   // Connect to WiFi (add timeout handling if needed)
@@ -179,12 +179,14 @@ void loop()
       while (digitalRead(buttons[i]) == HIGH)
       {
         /* code */
-        digitalWrite(drinkRelay[i], HIGH);
+        digitalWrite(drinkRelay[i], LOW);
         isDispensing = true;
         dispensingStartTime = millis();
         Serial.printf("Dispensing drink %d\n", i + 1);
         indicateLedStatus(LED_INDICATOR, DISPENSING_Status);
       }
+      // Reset drink queue
+      digitalWrite(drinkRelay[i], HIGH);
     }
   }
   if (digitalRead(drinkQuenceButton) == LOW)
@@ -206,6 +208,7 @@ void loop()
       }
     }
     // Reset drink queue
+    digitalWrite(drinkRelay[i], HIGH);
     drinkQueue = -1;
   }
 
