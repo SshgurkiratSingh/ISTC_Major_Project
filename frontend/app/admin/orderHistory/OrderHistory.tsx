@@ -534,8 +534,29 @@ function OrderHistory() {
                               <div>
                                 <div>{item.title}</div>
                                 <div>Quantity: {item.quantity}</div>
-                                <div>Price: {item.price}</div> <div>
-                                  {item.}
+                                <div className="flex items-center gap-2">
+                                  <div>Price: {item.price}</div>
+                                  <Button
+                                    size="sm"
+                                    color="success"
+                                    onClick={() => {
+                                      axios
+                                        .post(
+                                          `${API_BASE_URL}/api/v1/mqtt/publish`,
+                                          { drinkName: item.title }
+                                        )
+                                        .then((res) => {
+                                          toast.success(
+                                            JSON.stringify(res.data)
+                                          );
+                                        })
+                                        .catch((err) => {
+                                          toast.error(err);
+                                        });
+                                    }}
+                                  >
+                                    Publish Item
+                                  </Button>
                                 </div>
                                 {item.addOnIds && item.addOnIds.length > 0 && (
                                   <div>
