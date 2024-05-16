@@ -38,20 +38,21 @@ router.post("/publish", (req, res) => {
   }
   const topic = "drinkdispenser";
   switch (drinkName) {
-    case "Coke":
+    case "Orange Juice":
       client.publish(topic, "1");
       break;
-    case "Pepsi":
+    case "Mineral Water":
       client.publish(topic, "2");
       break;
-    case "Water":
+    case "oca Cola":
       client.publish(topic, "3");
       break;
-    case "Orange":
+    case "Cappuccino":
       client.publish(topic, "4");
       break;
     default:
-      res.status(400).json({ error: "Invalid drink name" });
+      client.publish("itemRequest", drinkName);
+
       break;
   }
   res.json({ message: "Data published successfully" });

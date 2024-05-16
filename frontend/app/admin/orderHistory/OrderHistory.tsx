@@ -534,7 +534,9 @@ function OrderHistory() {
                               <div>
                                 <div>{item.title}</div>
                                 <div>Quantity: {item.quantity}</div>
-                                <div>Price: {item.price}</div>
+                                <div>Price: {item.price}</div> <div>
+                                  {item.}
+                                </div>
                                 {item.addOnIds && item.addOnIds.length > 0 && (
                                   <div>
                                     Add-ons:
