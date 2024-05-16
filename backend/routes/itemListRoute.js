@@ -280,7 +280,7 @@ router.delete("/cart/:id", (req, res) => {
 router.get("/orders", async (req, res) => {
   const status = req.query.status; // Filter by status (optional)
   const skip = parseInt(req.query.skip) || 0;
-  const take = parseInt(req.query.take) || 10;
+  const take = parseInt(req.query.take) || 100;
   const sortBy = req.query.sortBy; // Optional sorting field
   const sortOrder = req.query.sortOrder || "desc"; // Optional sorting order
 

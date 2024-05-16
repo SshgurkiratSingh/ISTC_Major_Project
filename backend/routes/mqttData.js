@@ -25,5 +25,36 @@ router.get("/", (req, res) => {
   let dataToSend = [...mqttData];
   res.json(dataToSend.reverse());
 });
+router.get("/clear", (req, res) => {
+  mqttData = [];
+  res.json({ message: "Data cleared" });
+});
+// Publising data at drinkdispenser topic
+router.post("/publish", (req, res) => {
+  const { drinkName } = req.body;
+  if (!drinkName) {
+    res.status(400).json({ error: "Missing required fields" });
+    return;
+  }
+  const topic = "drinkdispenser";
+  switch (drinkName) {
+    case "Coke":
+      client.publish(topic, "1");
+      break;
+    case "Pepsi":
+      client.publish(topic, "2");
+      break;
+    case "Water":
+      client.publish(topic, "3");
+      break;
+    case "Orange":
+      client.publish(topic, "4");
+      break;
+    default:
+      res.status(400).json({ error: "Invalid drink name" });
+      break;
+  }
+  res.json({ message: "Data published successfully" });
+});
 
 module.exports = router;
