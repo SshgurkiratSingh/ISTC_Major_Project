@@ -238,7 +238,11 @@ router.post("/", async (req, res) => {
   }
 
   try {
-    const chatHistory = JSON.parse(conversationHistory) || [];
+    if (conversationHistory) {
+      let chatHistory = JSON.parse(conversationHistory) || [];
+    } else {
+      let chatHistory = [];
+    }
     // log the type of chatHistory and its value
 
     console.log(chatHistory);
@@ -279,8 +283,6 @@ router.post("/", async (req, res) => {
       console.log("Received LLM response:", llmResponse);
       throw new Error("Invalid JSON format received from LLM.");
     }
-
-    formattedChatHistory.push({ role: "user", content: userUtterance });
 
     formattedChatHistory.push({
       role: "assistant",
