@@ -53,6 +53,7 @@ import UserInfoCard from "../component/InfoCard";
 import { CartItem, MenuData } from "../component/MainPage/StartPage";
 import ItemBox from "../component/itemBox";
 import { CheckoutPage } from "./[tableID]/CheckoutPage";
+import LlmChat from "./[tableID]/LlmChat";
 interface CustomUserPageProps {
   tableId: string;
 }
@@ -297,6 +298,14 @@ export default function CustomUserPage({ tableId }: CustomUserPageProps) {
   return (
     <div className="min-h-[100vh] flex-col items-center justify-between text-white p-4 ">
       <div className="fixed right-1 z-10  top-[50vh] ">
+        {itemData && (
+          <LlmChat
+            cart={cart}
+            table={tableId}
+            mobileNumber={mobileNumber}
+            itemData={itemData || undefined}
+          />
+        )}
         <CheckoutPage cart={cart} mobileNumber={mobileNumber} table={tableId} />
         <Popover placement="bottom" showArrow={true}>
           <PopoverTrigger>
