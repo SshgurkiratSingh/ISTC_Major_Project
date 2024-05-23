@@ -14,7 +14,7 @@ client.on("connect", () => {
 });
 
 client.on("message", (topic, message) => {
-  console.log("Received message:", topic, message.toString());
+  // console.log("Received message:", topic, message.toString());
   if (mqttData.length > 25) {
     mqttData = mqttData.slice(25);
   }

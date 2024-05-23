@@ -161,9 +161,23 @@ async function removeItemFromCart(mobileNumber, itemName) {
 }
 
 async function getItemList() {
-  const itemList = await prisma.foodItem.findMany();
-  return itemList;
+  const itemList = await prisma.foodItem.findMany({
+    include: {
+      addOns: true, // Include the "addOns" relation in the query
+    },
+  });
+
+  return itemList.map((item) => {
+    const { description, className, imageUrl, updatedAt, createdAt, ...rest } =
+      item;
+    return rest;
+  });
 }
+
+router.get("/items", async (req, res) => {
+  const itemList = await getItemList();
+  res.json(itemList);
+});
 
 const customPrompt = `
 You are a friendly and casual dining assistant for a restaurant. Customers can chat with you by scanning a QR code on their table. Your role is to assist them with their orders, provide suggestions, handle order histories, and answer any queries. You are also a pro diet guide, food enthusiast, and persuader with extraordinary knowledge of food. Respond in a friendly and casual tone. Always use the following JSON format for your responses:
@@ -232,21 +246,19 @@ You are integrated with the restaurant's menu and ordering system, so make sure 
 router.post("/", async (req, res) => {
   const { username, mobileNumber, userUtterance, conversationHistory } =
     req.body;
-
   if (!userUtterance) {
     return res.status(400).json({ error: "userUtterance is required." });
   }
 
   try {
+    let chatHistory = [];
     if (conversationHistory) {
-      let chatHistory = JSON.parse(conversationHistory) || [];
+      chatHistory = JSON.parse(conversationHistory) || [];
+      console.log("fixed", chatHistory);
     } else {
-      let chatHistory = [];
+      console.log("clean", chatHistory);
     }
     // log the type of chatHistory and its value
-
-    console.log(chatHistory);
-    console.log(typeof chatHistory);
 
     const formattedChatHistory = chatHistory.map((turn) => ({
       role: turn.role === "user" ? "user" : "assistant",
@@ -268,6 +280,7 @@ router.post("/", async (req, res) => {
       messages: formattedChatHistory,
       response_format: { type: "json_object" },
     });
+
     console.log(chatResponse);
     const llmResponse = chatResponse.choices[0].message.content;
 
