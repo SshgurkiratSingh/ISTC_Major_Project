@@ -32,6 +32,9 @@ app.use("/api/v1/user/", apiForUser);
 const apiForMqtt = require("./routes/mqttData");
 app.use("/api/v1/mqtt/", apiForMqtt);
 
+const apiForLlm = require("./routes/llmRoute");
+app.use("/api/v1/llm/", apiForLlm);
+
 app.listen(port, "0.0.0.0", () => {
   console.log(`Server is online at port ${port}!`);
   console.log(`http://localhost:${port}`);

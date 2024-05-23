@@ -531,4 +531,5 @@ router.get("/cart/syncCart", async (req, res) => {
     res.status(404).json({ error: "User not loggedIn" });
   }
 });
+
 module.exports = router;
