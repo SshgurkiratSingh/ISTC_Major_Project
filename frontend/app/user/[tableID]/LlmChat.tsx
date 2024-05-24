@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import {
   Button,
@@ -17,10 +17,14 @@ import {
   Image,
   Accordion,
   AccordionItem,
+  Chip,
+  CardHeader,
 } from "@nextui-org/react";
 import { CheckoutPage } from "./CheckoutPage";
 import API_BASE_URL from "@/APIconfig";
 import { set } from "date-fns";
+import NowPlaying from "@/app/component/MainPage/NowPlaying";
+import { toast } from "react-toastify";
 
 export interface FoodItem {
   id: string;
@@ -104,7 +108,9 @@ export default function LlmChat({
   const [chatHistory, setChatHistory] = useState<ConversationTurn[]>([]);
   const [car, setCart] = useState<CartItem[]>([]);
   const [addToCartLoading, setAddToCartLoading] = useState<string | null>(null);
-
+  useEffect(() => {
+    setCart(cart);
+  });
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setIsLoading(true);
@@ -162,36 +168,67 @@ export default function LlmChat({
   };
 
   const handleAddToCart = async (itemId: string) => {
+    console.log("Adding to cart:", itemId);
     setAddToCartLoading(itemId);
     try {
       const item = Object.values(itemData)
         .flat()
         .find((item) => item.id === itemId);
-      const addOns = response?.add_ons[itemId] || [];
+
+      if (!item) {
+        console.error(`Item with id ${itemId} not found in itemData`);
+        setAddToCartLoading(null);
+        return;
+      }
+
+      const addOns = (response?.add_ons[itemId] || [])
+        .map((addOnId) => item.addOns.find((addOn) => addOn.id === addOnId))
+        .filter(Boolean) as AddOn[];
 
       const cartItem: CartItem = {
-        title: item?.name || "Unknown Item",
-        description: item?.description || "No description available",
-        imageUrl: item?.imageUrl || "https://via.placeholder.com/150",
-        price: item?.price || 0,
+        title: item.name,
+        description: item.description,
+        imageUrl: item.imageUrl || "https://via.placeholder.com/150",
+        price: item.price,
         quantity: 1,
-        addOnIds: addOns
-          .map((addOnId) => item?.addOns.find((addOn) => addOn.id === addOnId))
-          .filter(Boolean) as AddOn[],
+        addOnIds: addOns,
       };
-      setCart([...cart, cartItem]);
-      // Replace with actual API call to add item to cart
-      await axios.post(
-        `${API_BASE_URL}/api/v1/cart/mobile/${mobileNumber}`,
-        car
-      );
+      console.log(cartItem);
+      setCart((prevCart) => {
+        const updatedCart = [...prevCart, cartItem];
+        console.log("Cart updated:", updatedCart);
+        return updatedCart;
+      });
+      console.log(cart);
+
+      // Uncomment the following line if you want to send the updated cart to the server
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/api/v1/user/cart/mobile/${mobileNumber}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ car }), // Send the flat cart directly
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`API request failed with status ${response.status}`);
+        }
+
+        const updatedCart = await response.json();
+        setCart(updatedCart.cart);
+      } catch (error) {
+        console.error("Error updating cart:", error);
+        toast.error("An error occurred while updating the cart.");
+      }
+
       setAddToCartLoading(null);
     } catch (error) {
       console.error("Error adding to cart:", error);
       setAddToCartLoading(null);
     }
   };
-
   const renderContent = (messageContent: string) => {
     try {
       const parsedContent = JSON.parse(messageContent);
@@ -211,7 +248,7 @@ export default function LlmChat({
           backdrop="opaque"
           placement="top"
           scrollBehavior="inside"
-          className="dark h-full"
+          className="dark h-full w-full min-w-full"
           isOpen={isOpen}
           onClose={onClose}
         >
@@ -260,7 +297,11 @@ export default function LlmChat({
                             />
                           </div>
                         )}
-                        {response?.action_req === "Suggest_Item" &&
+                        {response?.action_req === "Req_Current_Song" && (
+                          <NowPlaying />
+                        )}
+                        {(response?.action_req === "Suggest_Item" ||
+                          response?.action_req === "New_Items") &&
                           (response.item_name || []).map((itemId) => {
                             const item = Object.values(itemData)
                               .flat()
@@ -272,6 +313,11 @@ export default function LlmChat({
                                 key={item.id}
                                 className="m-4 rounded-lg shadow-lg transition-all duration-300 hover:scale-105"
                               >
+                                {response?.action_req === "New_Items" && (
+                                  <CardHeader className="flex flex-col items-center justify-center p-6">
+                                    <Chip color="secondary">New</Chip>
+                                  </CardHeader>
+                                )}
                                 <CardBody className="flex flex-col items-center justify-center p-6">
                                   <div className="relative w-48 h-48 mb-4">
                                     <Image
@@ -313,7 +359,8 @@ export default function LlmChat({
                                                 />
                                               </div>
                                               <p className="text-sm text-gray-600 text-center">
-                                                {addOn.name} - Rs.{addOn.price}
+                                                {addOn.name} - Rs.
+                                                {addOn.price}
                                               </p>
                                             </div>
                                           ) : null;
