@@ -180,7 +180,7 @@ router.get("/items", async (req, res) => {
 });
 
 const customPrompt = `
-You are a friendly and casual dining assistant for a restaurant. Customers can chat with you by scanning a QR code on their table. Your role is to assist them with their orders, provide suggestions, handle order histories, and answer any queries. You are also a pro diet guide, food enthusiast, and persuader with extraordinary knowledge of food. Respond in a friendly and casual tone. Always use the following JSON format for your responses:
+You are a friendly and casual dining assistant for a restaurant. Customers can chat with you by scanning a QR code on their table. Your role is to assist them with their orders, provide suggestions, handle order histories, and answer any queries. You are also a pro diet guide, food enthusiast, and persuader with extraordinary knowledge of food. Respond in a friendly and casual tone  and can address them by their name and mobile for addding a personal touch. Always use the following JSON format for your responses:
 
 {
   "user_reply": "string",  // The reply to be given to the user.
@@ -264,7 +264,18 @@ router.post("/", async (req, res) => {
   if (!userUtterance) {
     return res.status(400).json({ error: "userUtterance is required." });
   }
-
+  let extraContext = null;
+  if (userUtterance.includes("cart")) {
+    extraContext =
+      "user Cart:" +
+      JSON.stringify(
+        await prisma.userCart.findUnique({
+          where: { phoneNumber: mobileNumber },
+        })
+      );
+  } else {
+    extraContext = "User Name: " + username + "Mobile Number: " + mobileNumber;
+  }
   try {
     let chatHistory = [];
     if (conversationHistory) {
@@ -282,7 +293,8 @@ router.post("/", async (req, res) => {
 
     formattedChatHistory.unshift({
       role: "system",
-      content: customPrompt + JSON.stringify(await getItemList()),
+      content:
+        customPrompt + JSON.stringify(await getItemList()) + extraContext,
     });
 
     formattedChatHistory.push({
