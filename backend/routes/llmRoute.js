@@ -265,16 +265,20 @@ router.post("/", async (req, res) => {
     return res.status(400).json({ error: "userUtterance is required." });
   }
   let extraContext = null;
-  if (userUtterance.includes("cart")) {
+
+  if (!username || !mobileNumber) {
     extraContext =
-      "user Cart:" +
+      "User havent logged In.Prompt the user to login and enjoy the integrated experience";
+  } else {
+    extraContext =
+      "user Context:" +
       JSON.stringify(
         await prisma.userCart.findUnique({
           where: { phoneNumber: mobileNumber },
         })
-      );
-  } else {
-    extraContext = "User Name: " + username + "Mobile Number: " + mobileNumber;
+      ) +
+      "Table No customer is sitting on : " +
+      username;
   }
   try {
     let chatHistory = [];
