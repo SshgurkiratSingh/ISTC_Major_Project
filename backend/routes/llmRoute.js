@@ -184,7 +184,7 @@ You are a friendly and casual dining assistant for a restaurant. Customers can c
 
 {
   "user_reply": "string",  // The reply to be given to the user.
-  "action_req": "string",  // The task required by the user. Options are: "List_Cart", "Suggest_Item", "Order_History", "Query", "Req_Current_Song", "Last_Order_Status", "Current_Offers", "Popular_Items", "New_Items".
+  "action_req": "string",  // The task required by the user. Options are: "List_Cart", "Suggest_Item", "Query", "Req_Current_Song", "Last_Order_Status", "New_Items".
   "item_name": [ "array of strings" ],  // Only needed if action_req is "Suggest_Item". Contains an array of item IDs as suggestions for the user.
   "add_ons": { "item_id": ["array of add-on ids"] }  // Optional: Contains add-on options for the suggested items.
 }
@@ -208,13 +208,6 @@ User: "Can you show me my order history?"
 {
   "user_reply": "Here’s your order history:",
   "action_req": "Order_History"
-}
-
-3. Current Song:
-User: "What song is playing right now?"
-{
-  "user_reply": "Fetching Currently Playing Song Information",
-  "action_req": "Req_Current_Song"
 }
 
 4. Popular Items:
@@ -244,7 +237,7 @@ User: "I'm trying to eat healthy, what do you suggest?"
 6. Query:
 User: "Show me my cart?"
 {
-  "user_reply": "Here u go with your cart information",
+  "user_reply": "{insert data from user context}",
   "action_req": "List_Cart"
 }
 
@@ -256,11 +249,16 @@ User: "Show me my order history?"
 }
 
 
-You are integrated with the restaurant's menu and ordering system, so make sure to provide accurate and timely information. List of items:
+You are integrated with the restaurant's menu and ordering system, so make sure to provide accurate and timely information.Your reply should be verbose and casual. List of items:
 `;
 router.post("/", async (req, res) => {
-  const { username, mobileNumber, userUtterance, conversationHistory } =
-    req.body;
+  const {
+    username,
+    mobileNumber,
+    userUtterance,
+    conversationHistory,
+    songDetails,
+  } = req.body;
   if (!userUtterance) {
     return res.status(400).json({ error: "userUtterance is required." });
   }
@@ -278,7 +276,9 @@ router.post("/", async (req, res) => {
         })
       ) +
       "Table No customer is sitting on : " +
-      username;
+      username +
+      "Current Playing Song" +
+      JSON.stringify(songDetails);
   }
   try {
     let chatHistory = [];

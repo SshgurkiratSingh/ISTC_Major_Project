@@ -30,6 +30,7 @@ router.get("/clear", (req, res) => {
   res.json({ message: "Data cleared" });
 });
 // Publising data at drinkdispenser topic
+
 router.post("/publish", (req, res) => {
   const { drinkName } = req.body;
   if (!drinkName) {
