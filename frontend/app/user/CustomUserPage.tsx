@@ -130,11 +130,10 @@ export default function CustomUserPage({ tableId }: CustomUserPageProps) {
       }
     };
 
-    fetchCurrentPlaying();
-    const interval = setInterval(fetchCurrentPlaying, 50000); // Refresh every 50 seconds
-    
+    const interval = setInterval(fetchCurrentPlaying, 5000); // Refresh every 50 seconds
+
     return () => clearInterval(interval); // Cleanup the interval on component unmount
-  }, [currentPlaying, setCurrentPlaying,]);
+  }, [currentPlaying, setCurrentPlaying]);
 
   const handleCheckout = async () => {
     if (cart.length === 0) {

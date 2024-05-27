@@ -9,7 +9,7 @@ const NowPlaying = (
   { title, artist, link }: Props = {
     title: "",
     artist: "",
-    link: "http://localhost:2500/api/v1/spotify/login",
+    link: "http://ec2-44-204-194-140.compute-1.amazonaws.com:2500/api/v1/spotify/login",
   }
 ) => {
   return (
