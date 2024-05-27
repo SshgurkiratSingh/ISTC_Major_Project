@@ -54,6 +54,7 @@ import { CartItem, MenuData } from "../component/MainPage/StartPage";
 import ItemBox from "../component/itemBox";
 import { CheckoutPage } from "./[tableID]/CheckoutPage";
 import LlmChat from "./[tableID]/LlmChat";
+import NowPlaying from "../component/MainPage/NowPlaying";
 interface CustomUserPageProps {
   tableId: string;
 }
@@ -69,6 +70,15 @@ export default function CustomUserPage({ tableId }: CustomUserPageProps) {
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [orderId, setOrderId] = useState("");
   const [upiImage, setUpiImage] = useState("");
+  const [currentPlaying, setCurrentPlaying] = useState<{
+    artist: string;
+    title: string;
+    link: string;
+  }>({
+    artist: "",
+    title: "",
+    link: "",
+  });
 
   const [selectedAddOns, setSelectedAddOns] = useState<{
     [itemId: string]: string[];
@@ -102,6 +112,29 @@ export default function CustomUserPage({ tableId }: CustomUserPageProps) {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    const fetchCurrentPlaying = async () => {
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/api/v1/spotify/currentQueue`
+        );
+        const data = await response.json();
+        setCurrentPlaying({
+          artist: data.body.item.artists[0].name,
+          title: data.body.item.name,
+          link: data.body.item.external_urls.spotify,
+        });
+      } catch (error) {
+        console.error("Error fetching current playing track:", error);
+      }
+    };
+
+    fetchCurrentPlaying();
+    const interval = setInterval(fetchCurrentPlaying, 50000); // Refresh every 50 seconds
+    
+    return () => clearInterval(interval); // Cleanup the interval on component unmount
+  }, [currentPlaying, setCurrentPlaying,]);
 
   const handleCheckout = async () => {
     if (cart.length === 0) {
@@ -304,6 +337,8 @@ export default function CustomUserPage({ tableId }: CustomUserPageProps) {
             table={tableId}
             mobileNumber={mobileNumber}
             itemData={itemData || undefined}
+            refreshCart={refreshCart}
+            currentSongPlaying={currentPlaying}
           />
         )}
         <CheckoutPage cart={cart} mobileNumber={mobileNumber} table={tableId} />
@@ -411,10 +446,15 @@ export default function CustomUserPage({ tableId }: CustomUserPageProps) {
           className="py-4 bg-black/30 min-h-screen min-w-24 text-slate-50"
           style={{ backdropFilter: "blur(25px)" }}
         >
-          <CardHeader className="w-full">
+          <CardHeader className="w-full flex flex-col justify-end">
             <h2 className="text-xl font-bold">
               Order Item From Table {tableId}
             </h2>
+            <NowPlaying
+              title={currentPlaying.title}
+              artist={currentPlaying.artist}
+              link={currentPlaying.link}
+            />
           </CardHeader>
           <Divider className="bg-white" />
           {mobileNumber.length === 10 ? (

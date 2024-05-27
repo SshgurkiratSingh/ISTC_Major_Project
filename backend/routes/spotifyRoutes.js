@@ -48,6 +48,17 @@ router.get("/currentQueue", (req, res) => {
     }
   );
 });
+router.get("/nextSong", (req, res) => {
+  spotify.skipToNext().then(
+    function (data) {
+      res.json(data);
+    },
+    function (err) {
+      console.log("Something went wrong!", err);
+      res.send(err);
+    }
+  );
+});
 router.get("/callback", (req, res) => {
   const error = req.query.error;
   const code = req.query.code;

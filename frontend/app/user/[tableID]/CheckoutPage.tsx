@@ -21,6 +21,7 @@ import upiqr from "upiqr";
 interface CheckoutPageProps {
   cart: CartItem[];
   table: string;
+  
   mobileNumber: string;
 }
 
