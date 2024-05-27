@@ -108,9 +108,33 @@ export default function LlmChat({
   const [chatHistory, setChatHistory] = useState<ConversationTurn[]>([]);
   const [car, setCart] = useState<CartItem[]>([]);
   const [addToCartLoading, setAddToCartLoading] = useState<string | null>(null);
+  const [currentPlaying, setCurrentPlaying] = useState<{
+    artist: string;
+    title: string;
+    link: string;
+  }>({ artist: "", title: "", link: "" });
   useEffect(() => {
     setCart(cart);
   });
+  useEffect(() => {
+    const fetchCurrentPlaying = async () => {
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/api/v1/spotify/currentQueue`
+        );
+        const data = await response.json();
+        setCurrentPlaying({
+          artist: data.body.item.artists[0].name,
+          title: data.body.item.name,
+          link: data.body.item.external_urls.spotify,
+        });
+      } catch (error) {
+        console.error("Error fetching current playing track:", error);
+      }
+    };
+
+    fetchCurrentPlaying();
+  }, []);
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setIsLoading(true);
@@ -298,7 +322,7 @@ export default function LlmChat({
                           </div>
                         )}
                         {response?.action_req === "Req_Current_Song" && (
-                          <NowPlaying />
+                          <NowPlaying title={currentPlaying.title} artist={currentPlaying.artist} link={currentPlaying.link}  />
                         )}
                         {(response?.action_req === "Suggest_Item" ||
                           response?.action_req === "New_Items") &&
