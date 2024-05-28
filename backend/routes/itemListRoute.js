@@ -8,7 +8,6 @@ const mqtt = require("mqtt");
 const client = mqtt.connect("mqtt://localhost:1883");
 client.on("connect", () => {
   console.log("Connected to MQTT broker");
-
 });
 const prisma = new PrismaClient();
 let tableStatus = [[], [], []];
@@ -153,7 +152,7 @@ router.delete("/tables/:tableNumber/status", async (req, res) => {
 router.put("/tables/:tableNumber/status", async (req, res) => {
   const tableNumber = parseInt(req.params.tableNumber);
   const newStatus = req.body.status;
-client.publish("buzzer",1);
+  client.publish("buzzer", "1");
   if (tableNumber < 1 || tableNumber > tableStatus.length) {
     res.status(400).json({ error: "Invalid table number" });
     return;
@@ -311,7 +310,7 @@ router.get("/orders", async (req, res) => {
 router.put("/orders/:id/status", async (req, res) => {
   const allowedStatuses = ["pending", "preparing", "ready", "completed"];
   const newStatus = req.body.status;
-client.publish("buzzer",1);
+  client.publish("buzzer", "1");
   if (!allowedStatuses.includes(newStatus)) {
     res.status(400).json({ error: "Invalid status" });
     return;
@@ -330,7 +329,7 @@ client.publish("buzzer",1);
 // Purpose : Update an order's table number
 router.put("/orders/:id/table", async (req, res) => {
   const newTableNumber = req.body.tableNumber;
-client.publish("buzzer",1);
+  client.publish("buzzer", "1");
   if (!isTableAvailable(newTableNumber)) {
     res.status(400).json({ error: "Table is not available" });
     return;
@@ -362,14 +361,14 @@ router.delete("/orders/:id", async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-  client.publish("buzzer",1);
+  client.publish("buzzer", "1");
 });
 // Purpose: Update an order's payment status (e.g., 'pending', 'paid', 'failed').
 
 router.put("/orders/:id/payment-status", async (req, res) => {
   const allowedStatuses = ["pending", "paid", "failed"];
   const newStatus = req.body.status;
-client.publish("buzzer",1);
+  client.publish("buzzer", 1);
   if (!allowedStatuses.includes(newStatus)) {
     res.status(400).json({ error: "Invalid status" });
     return;
@@ -409,7 +408,7 @@ router.get("/orders/tables", async (req, res) => {
 // Purpose: Allows cancellation of an order, typically if it hasn't reached a certain stage of preparation.
 router.post("/orders/:id/cancel", async (req, res) => {
   try {
-    client.publish("buzzer",1);
+    client.publish("buzzer", "1");
     const order = await prisma.order.findUnique({
       where: { id: req.params.id },
     });
