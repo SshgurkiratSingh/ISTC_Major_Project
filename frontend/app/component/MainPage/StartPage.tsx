@@ -223,7 +223,7 @@ const HomePage = () => {
                   artist={currentPlaying.artist}
                   link={
                     currentPlaying.link ||
-                    "http://localhost:2500/api/v1/spotify/login1"
+                    "http://ec2-44-204-194-140.compute-1.amazonaws.com:2500/api/v1/spotify/login1"
                   }
                 />
               </div>
