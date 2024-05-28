@@ -14,11 +14,14 @@ client.on("connect", () => {
 });
 
 client.on("message", (topic, message) => {
-  // console.log("Received message:", topic, message.toString());
-  if (mqttData.length > 25) {
-    mqttData = mqttData.slice(25);
+  const [table, sensor] = topic.split("/");
+  if (tables[table]) {
+    tables[table][sensor] = message.toString();
   }
-  mqttData.push({ id: new Date(), topic: topic, message: message.toString() });
+  mqttData.push({ topic, message: message.toString() });
+  if (mqttData.length > 25) {
+    mqttData = mqttData.slice(-25);
+  }
 });
 
 router.get("/", (req, res) => {
@@ -30,6 +33,29 @@ router.get("/clear", (req, res) => {
   res.json({ message: "Data cleared" });
 });
 // Publising data at drinkdispenser topic
+const tables = {
+  table1: {
+    light: null,
+    temp: null,
+    humidity: null,
+    ldr: null,
+    notification_string: null,
+  },
+  table2: {
+    light: null,
+    temp: null,
+    humidity: null,
+    ldr: null,
+    notification_string: null,
+  },
+  table3: {
+    light: null,
+    temp: null,
+    humidity: null,
+    ldr: null,
+    notification_string: null,
+  },
+};
 
 router.post("/publish", (req, res) => {
   const { drinkName } = req.body;
