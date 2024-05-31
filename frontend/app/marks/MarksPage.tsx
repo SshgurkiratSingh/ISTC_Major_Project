@@ -1,5 +1,5 @@
 "use client";
-import { Card, CardHeader, Input, Button } from "@nextui-org/react";
+import { Card, CardHeader, Input, Button, Chip } from "@nextui-org/react";
 import { motion, AnimatePresence, MotionConfig } from "framer-motion";
 import React, { useState } from "react";
 import { ToastContainer } from "react-toastify";
@@ -12,6 +12,7 @@ import {
   TableRow,
   TableCell,
 } from "@nextui-org/table";
+import { stat } from "fs";
 
 interface AnswerResult {
   attempted: number;
@@ -112,8 +113,15 @@ function MarksPage() {
         }
       } else {
         attempted++;
-
-        if (userAnswer === correctAnswer) {
+        if (correctAnswer === "x") {
+          xCount++;
+          marks += 1;
+          detailedCheck[questionNumber] = {
+            correctAnswer,
+            userAnswer,
+            status: "Marks Given",
+          };
+        } else if (userAnswer === correctAnswer) {
           correct++;
           marks += 1;
           detailedCheck[questionNumber] = {
@@ -152,7 +160,7 @@ function MarksPage() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          <Card className="py-4 bg-black/40 min-w-[24rem] max-w-4xl backdrop-blur-xl rounded-lg shadow-lg">
+          <Card className="py-4 bg-black/40 min-w-[24rem]  backdrop-blur-xl rounded-lg shadow-lg max-w-[90%]">
             <CardHeader className="pb-2 pt-0 px-4 flex flex-col items-start">
               <motion.div
                 className="flex flex-col justify-between items-start gap-4 w-full"
@@ -223,7 +231,21 @@ function MarksPage() {
                               <TableCell>{questionNumber}</TableCell>
                               <TableCell>{correctAnswer}</TableCell>
                               <TableCell>{userAnswer}</TableCell>
-                              <TableCell>{status}</TableCell>
+                              <TableCell>
+                                <Chip
+                                  color={
+                                    status === "Correct"
+                                      ? "success"
+                                      : status === "Marks Given"
+                                      ? "primary"
+                                      : status === "Wrong"
+                                      ? "danger"
+                                      : "warning"
+                                  }
+                                >
+                                  {status}
+                                </Chip>
+                              </TableCell>
                             </TableRow>
                           )
                         )}
