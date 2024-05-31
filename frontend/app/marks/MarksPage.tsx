@@ -1,5 +1,13 @@
 "use client";
-import { Card, CardHeader, Input, Button, Chip } from "@nextui-org/react";
+import {
+  Card,
+  CardHeader,
+  Input,
+  Button,
+  Chip,
+  Accordion,
+  AccordionItem,
+} from "@nextui-org/react";
 import { motion, AnimatePresence, MotionConfig } from "framer-motion";
 import React, { useState } from "react";
 import { ToastContainer } from "react-toastify";
@@ -13,6 +21,7 @@ import {
   TableCell,
 } from "@nextui-org/table";
 import { stat } from "fs";
+import SubjectResultCard from "./SubjectResultCard";
 
 interface AnswerResult {
   attempted: number;
@@ -29,6 +38,28 @@ interface AnswerResult {
   };
 }
 
+const subjectCategories = {
+  Math: [1, 10],
+  Physics: [11, 20],
+  Electrical: [21, 30],
+  Electronics: [31, 40],
+  Programming: [41, 50],
+  Mechanical: [51, 60],
+  Civil: [61, 70],
+  Chemical: [71, 80],
+  Chemistry: [81, 90],
+  EnglishAndAptitude: [91, 100],
+};
+interface SubjectResult {
+  attempted: number;
+  correct: number;
+  wrong: number;
+  marks: string;
+}
+
+interface SubjectResults {
+  [key: string]: SubjectResult;
+}
 const storedPapers: { [key: string]: string } = {
   "2021":
     "1 C 2 A 3 D 4 B 5 A 6 B 7 B 8 C 9 A 10 D 11 B 12 D 13 C 14 D 15 A 16 B 17 D 18 B 19 A 20 C 21 D 22 A 23 B 24 D 25 C 26 A 27 D 28 A 29 D 30 D 31 B 32 D 33 A 34 A 35 C 36 A 37 C 38 D 39 D 40 C 41 A 42 X 43 D 44 A 45 B 46 D 47 A 48 B 49 D 50 D 51 C 52 C 53 A 54 A 55 C 56 C 57 D 58 B 59 C 60 D 61 A 62 B 63 C 64 C 65 B 66 A 67 X 68 X 69 A 70 X 71 B 72 B 73 B 74 B 75 C 76 D 77 B 78 A 79 B 80 A 81 C 82 B 83 C 84 D 85 C 86 D 87 B 88 B 89 C 90 A 91 C 92 B 93 D 94 A 95 B 96 C 97 A 98 D 99 B 100 D",
@@ -46,6 +77,7 @@ const storedPapers: { [key: string]: string } = {
 
 function MarksPage() {
   const [correctAnswer, setCorrectAnswer] = useState<string>("");
+  const [subjectResults, setSubjectResults] = useState<SubjectResults>({});
   const [userInput, setUserInput] = useState<string>("");
   const [result, setResult] = useState<AnswerResult>({
     attempted: 0,
@@ -69,7 +101,36 @@ function MarksPage() {
     }
     return answers;
   };
-
+  const calculateSubjectResults = (detailedCheck: {
+    [key: number]: {
+      correctAnswer: string;
+      userAnswer: string;
+      status: string;
+    };
+  }) => {
+    const results: SubjectResults = {};
+    Object.entries(subjectCategories).forEach(([subject, [start, end]]) => {
+      let attempted = 0;
+      let correct = 0;
+      let wrong = 0;
+      let marks = 0;
+      for (let i = start; i <= end; i++) {
+        const answerDetail = detailedCheck[i];
+        if (answerDetail) {
+          attempted++;
+          if (answerDetail.status === "Correct") {
+            correct++;
+            marks += 1; // Adjust the correct mark scoring here
+          } else if (answerDetail.status === "Wrong") {
+            wrong++;
+            marks -= 0.25; // Adjust the penalty for wrong answers
+          }
+        }
+      }
+      results[subject] = { attempted, correct, wrong, marks: marks.toFixed(2) };
+    });
+    return results;
+  };
   const handleCheckAnswer = () => {
     const correctAnswers = parseAnswers(correctAnswer);
     const userAnswers = parseAnswers(userInput);
@@ -115,7 +176,7 @@ function MarksPage() {
         attempted++;
         if (correctAnswer === "x") {
           xCount++;
-          marks += 1;
+          marks += 1; // example scoring rule
           detailedCheck[questionNumber] = {
             correctAnswer,
             userAnswer,
@@ -123,7 +184,7 @@ function MarksPage() {
           };
         } else if (userAnswer === correctAnswer) {
           correct++;
-          marks += 1;
+          marks += 1; // example scoring rule
           detailedCheck[questionNumber] = {
             correctAnswer,
             userAnswer,
@@ -131,7 +192,7 @@ function MarksPage() {
           };
         } else {
           wrong++;
-          marks -= 0.25;
+          marks -= 0.25; // example penalty rule
           detailedCheck[questionNumber] = {
             correctAnswer,
             userAnswer,
@@ -149,6 +210,7 @@ function MarksPage() {
       xCount,
       detailedCheck,
     });
+    setSubjectResults(calculateSubjectResults(detailedCheck));
   };
 
   return (
@@ -213,7 +275,32 @@ function MarksPage() {
                     <p className="text-sm">Correct: {result.correct}</p>
                     <p className="text-sm">Wrong: {result.wrong}</p>
                     <p className="text-sm">Marks: {result.marks}</p>
-                    <p className="text-sm">X Count: {result.xCount}</p>
+                    <p className="text-sm">X Count: {result.xCount}</p>{" "}
+                    <Accordion>
+                      <AccordionItem
+                        key="1"
+                        aria-label="Subject Analysis"
+                        subtitle="Press to expand"
+                        title="Subject Analysis"
+                        className=""
+                      >
+                        <div className="grid grid-cols-2 gap-4">
+                          {Object.entries(subjectResults).map(
+                            ([subject, res]) => (
+                              <SubjectResultCard
+                                key={subject}
+                                subject={subject}
+                                attempted={res.attempted}
+                                correct={res.correct}
+                                wrong={res.wrong}
+                                marks={res.marks}
+                              />
+                            )
+                          )}
+                        </div>
+                      </AccordionItem>
+                    </Accordion>
+                    <div className="grid grid-cols-2 gap-4 mt-4"></div>
                     <Table className="w-full text-black mt-4">
                       <TableHeader className="bg-gradient-to-r from-purple-600 to-purple-800 text-white">
                         <TableColumn>Question Number</TableColumn>
