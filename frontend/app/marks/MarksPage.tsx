@@ -7,6 +7,8 @@ import {
   Chip,
   Accordion,
   AccordionItem,
+  Select,
+  SelectItem,
 } from "@nextui-org/react";
 import { motion, AnimatePresence, MotionConfig } from "framer-motion";
 import React, { useState } from "react";
@@ -22,6 +24,7 @@ import {
 } from "@nextui-org/table";
 import { stat } from "fs";
 import SubjectResultCard from "./SubjectResultCard";
+import ExamModal from "./ExamModal";
 
 interface AnswerResult {
   attempted: number;
@@ -87,6 +90,11 @@ function MarksPage() {
     xCount: 0,
     detailedCheck: {},
   });
+  const [selectedYear, setSelectedYear] = useState<string>("2023");
+
+  const handleExamAnswersChange = (answers: string) => {
+    setUserInput(answers);
+  };
 
   const parseAnswers = (input: string) => {
     const answers: { [key: number]: string } = {};
@@ -131,6 +139,11 @@ function MarksPage() {
     });
     return results;
   };
+  const handleSelectionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedYear(e.target.value);
+    setCorrectAnswer(storedPapers[e.target.value]);
+  };
+
   const handleCheckAnswer = () => {
     const correctAnswers = parseAnswers(correctAnswer);
     const userAnswers = parseAnswers(userInput);
@@ -257,17 +270,29 @@ function MarksPage() {
                   onClick={handleCheckAnswer}
                 >
                   Check Answer
-                </Button>
-                <div className="w-full flex flex-wrap gap-2 mt-4">
-                  {Object.keys(storedPapers).map((year) => (
-                    <Button
-                      key={year}
-                      className="bg-gradient-to-r from-purple-600 to-purple-800 text-white"
-                      onClick={() => setCorrectAnswer(storedPapers[year])}
+                </Button>{" "}
+                <div className="w-full flex flex-wrap gap-2 mt-4 justify-center">
+                  <ExamModal
+                    onAnswersChange={handleExamAnswersChange}
+                    selectedYear={selectedYear}
+                  />
+                  <div className="w-full flex flex-wrap gap-2 mt-4">
+                    <Select
+                      className="w-full dark"
+                      selectedKeys={[selectedYear]}
+                      onChange={handleSelectionChange}
                     >
-                      {year}
-                    </Button>
-                  ))}
+                      {Object.keys(storedPapers).map((year) => (
+                        <SelectItem
+                          key={year}
+                          value={year}
+                          className="text-white dark bg-black"
+                        >
+                          {year}
+                        </SelectItem>
+                      ))}
+                    </Select>
+                  </div>
                 </div>
                 {result.attempted > 0 && (
                   <div className="w-full text-white mt-4 p-4 bg-gradient-to-r from-gray-700 via-gray-900 to-black rounded-lg">
