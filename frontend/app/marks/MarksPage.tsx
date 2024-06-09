@@ -26,7 +26,7 @@ import { stat } from "fs";
 import SubjectResultCard from "./SubjectResultCard";
 import ExamModal from "./ExamModal";
 
-interface AnswerResult {
+export interface AnswerResult {
   attempted: number;
   correct: number;
   wrong: number;
@@ -37,6 +37,7 @@ interface AnswerResult {
       correctAnswer: string;
       userAnswer: string;
       status: string;
+      marksImpact?: string; // Add this line
     };
   };
 }
@@ -79,7 +80,9 @@ const storedPapers: { [key: string]: string } = {
 };
 
 function MarksPage() {
-  const [correctAnswer, setCorrectAnswer] = useState<string>("");
+  const [correctAnswer, setCorrectAnswer] = useState<string>(
+    storedPapers["2023"]
+  );
   const [subjectResults, setSubjectResults] = useState<SubjectResults>({});
   const [userInput, setUserInput] = useState<string>("");
   const [result, setResult] = useState<AnswerResult>({
@@ -221,11 +224,14 @@ function MarksPage() {
       wrong,
       marks: marks.toFixed(2),
       xCount,
-      detailedCheck,
+      detailedCheck: { ...detailedCheck },
     });
     setSubjectResults(calculateSubjectResults(detailedCheck));
   };
-
+  const handleExamResultChange = (result: AnswerResult) => {
+    setResult(result);
+    setSubjectResults(calculateSubjectResults(result.detailedCheck));
+  };
   return (
     <AnimatePresence>
       <MotionConfig transition={{ duration: 0.5 }}>
@@ -273,11 +279,13 @@ function MarksPage() {
                 </Button>{" "}
                 <div className="w-full flex flex-wrap gap-2 mt-4 justify-center">
                   <ExamModal
+                    correctAnswers={correctAnswer}
                     onAnswersChange={handleExamAnswersChange}
                     selectedYear={selectedYear}
                   />
                   <div className="w-full flex flex-wrap gap-2 mt-4">
                     <Select
+                      label="Select Year"
                       className="w-full dark"
                       selectedKeys={[selectedYear]}
                       onChange={handleSelectionChange}
