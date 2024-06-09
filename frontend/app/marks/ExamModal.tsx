@@ -164,20 +164,23 @@ const ExamModal: React.FC<ExamModalProps> = ({
         isOpen={isOpen}
         onClose={onModalClose}
         scrollBehavior="outside"
-        className="dark min-w-[90%]"
+        className="dark min-w-[90%] max-h-[100%] bg-gradient-to-tr from-neutral-400/90 overflow-auto "
+        backdrop="blur"
       >
         <ModalContent>
           <ModalHeader>Exam Paper {selectedYear}</ModalHeader>
           <ModalBody>
             <div className="flex gap-4 flex-row justify-evenly">
               <div className="h-[70vh] flex flex-col ">
-                <div>
-                  <embed
-                    src={`http://localhost:3000/${selectedYear}.pdf#page=${pageNumber}`}
-                    width="900"
-                    height="600"
-                  />
-                </div>
+                {window.innerWidth > 768 && (
+                  <div>
+                    <embed
+                      src={`http://localhost:3000/${selectedYear}.pdf#page=${2}`}
+                      width="900"
+                      height="600"
+                    />
+                  </div>
+                )}
                 <div className="flex justify-between w-full mt-4"></div>
               </div>
               <div className="h-[70vh] overflow-auto">
