@@ -18,6 +18,7 @@ interface ExamModalProps {
   onAnswersChange: (answers: string) => void;
   selectedYear: string;
   correctAnswers: string;
+  userInput: string;
 }
 
 const options = ["A", "B", "C", "D"];
@@ -26,12 +27,30 @@ const ExamModal: React.FC<ExamModalProps> = ({
   onAnswersChange,
   selectedYear,
   correctAnswers,
+  userInput,
 }) => {
+  const parseAnswers = (input: string) => {
+    const answers: { [key: number]: string } = {};
+    const parts = input.trim().split(/\s+/);
+    for (let i = 0; i < parts.length; i += 2) {
+      const questionNumber = parseInt(parts[i], 10);
+      if (!isNaN(questionNumber)) {
+        const answer = parts[i + 1]?.toLowerCase().trim() || ""; // Use optional chaining to handle undefined
+        answers[questionNumber] = answer;
+      }
+    }
+    return answers;
+  };
+
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [userAnswers, setUserAnswers] = useState<{ [key: number]: string }>({});
+  const [userAnswers, setUserAnswers] = useState<{ [key: number]: string }>(
+    parseAnswers(userInput)
+  );
+  const [visible, setVisible] = useState(false);
   const [numPages, setNumPages] = useState<number>(0);
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [pdfLoading, setPdfLoading] = useState<boolean>(true);
+  const [modalUserInput, setModalUserInput] = useState("");
   const [examResult, setExamResult] = useState<AnswerResult>({
     attempted: 0,
     correct: 0,
@@ -41,18 +60,16 @@ const ExamModal: React.FC<ExamModalProps> = ({
     detailedCheck: {},
   });
   const [answersChecked, setAnswersChecked] = useState<boolean>(false);
-  const parseAnswers = (input: string) => {
-    const answers: { [key: number]: string } = {};
-    const parts = input.trim().split(/\s+/);
-    for (let i = 0; i < parts.length; i += 2) {
-      const questionNumber = parseInt(parts[i], 10);
-      if (!isNaN(questionNumber)) {
-        const answer = parts[i + 1].toLowerCase().trim();
-        answers[questionNumber] = answer;
-      }
+
+  useEffect(() => {
+    if (isOpen) {
+      setModalUserInput(
+        Object.entries(parseAnswers(userInput))
+          .map(([q, a]) => `${q} ${a}`)
+          .join(" ")
+      );
     }
-    return answers;
-  };
+  }, [isOpen, userInput]);
 
   const handleOptionClick = (question: number, option: string) => {
     const newAnswers = { ...userAnswers, [question]: option };
@@ -91,6 +108,7 @@ const ExamModal: React.FC<ExamModalProps> = ({
       }));
     }
   };
+
   const handleCheckAnswer = () => {
     const correctAnswersObj = parseAnswers(correctAnswers);
 
@@ -150,10 +168,6 @@ const ExamModal: React.FC<ExamModalProps> = ({
     setAnswersChecked(true);
   };
 
-  const onModalClose = () => {
-    onClose();
-    setAnswersChecked(false);
-  };
   return (
     <>
       <Button onPress={onOpen} color="primary">
@@ -162,7 +176,7 @@ const ExamModal: React.FC<ExamModalProps> = ({
 
       <Modal
         isOpen={isOpen}
-        onClose={onModalClose}
+        onClose={onClose}
         scrollBehavior="outside"
         className="dark min-w-[90%] max-h-[100%] bg-gradient-to-tr from-neutral-400/90 overflow-auto "
         backdrop="blur"
@@ -279,7 +293,7 @@ const ExamModal: React.FC<ExamModalProps> = ({
             )}
           </ModalBody>
           <ModalFooter>
-            <Button color="danger" onPress={onModalClose}>
+            <Button color="danger" onPress={onClose}>
               Close
             </Button>
           </ModalFooter>

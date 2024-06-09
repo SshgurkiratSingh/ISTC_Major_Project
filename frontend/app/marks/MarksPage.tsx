@@ -85,6 +85,7 @@ function MarksPage() {
   );
   const [subjectResults, setSubjectResults] = useState<SubjectResults>({});
   const [userInput, setUserInput] = useState<string>("");
+
   const [result, setResult] = useState<AnswerResult>({
     attempted: 0,
     correct: 0,
@@ -279,6 +280,7 @@ function MarksPage() {
                 </Button>{" "}
                 <div className="w-full flex flex-wrap gap-2 mt-4 justify-center">
                   <ExamModal
+                    userInput={userInput}
                     correctAnswers={correctAnswer}
                     onAnswersChange={handleExamAnswersChange}
                     selectedYear={selectedYear}
