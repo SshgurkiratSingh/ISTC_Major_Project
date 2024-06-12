@@ -17,7 +17,7 @@ import { useEffect, useState } from "react";
 import API_BASE_URL from "@/APIconfig";
 import { motion, AnimatePresence } from "framer-motion";
 // import toast, { toastConfig } from "react-simple-toasts";
-import "react-simple-toasts/dist/theme/ocean-wave.css";
+// import "react-simple-toasts/dist/theme/ocean-wave.css";
 import { Bounce, ToastContainer, toast } from "react-toastify";
 // toastConfig({
 //   theme: "ocean-wave",
