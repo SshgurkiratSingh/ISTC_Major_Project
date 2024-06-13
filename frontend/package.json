@@ -32,6 +32,9 @@
     "flowbite": "^2.3.0",
     "react-toastify": "^10.0.5",
     "recharts": "^2.12.1",
+   
+    "react-simple-toasts": "^5.10.0",
+   
     "upiqr": "^1.1.1",
     "uuid": "^9.0.1"
   },
