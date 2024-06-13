@@ -189,7 +189,7 @@ const ExamModal: React.FC<ExamModalProps> = ({
                 {window.innerWidth > 768 && (
                   <div>
                     <embed
-                      src={`http://localhost:3000/${selectedYear}.pdf#page=${2}`}
+                      src={`/${selectedYear}.pdf#page=${2}`}
                       width="900"
                       height="600"
                     />
