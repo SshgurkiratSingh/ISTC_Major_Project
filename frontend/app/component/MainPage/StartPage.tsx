@@ -13,12 +13,13 @@ import NowPlaying from "./NowPlaying";
 import ItemBox from "../itemBox";
 import Cart from "./Cart";
 import LoginPageForKiosk from "./Login";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import API_BASE_URL from "@/APIconfig";
 import { motion, AnimatePresence } from "framer-motion";
 // import toast, { toastConfig } from "react-simple-toasts";
 import "react-simple-toasts/dist/theme/ocean-wave.css";
 import { Bounce, ToastContainer, toast } from "react-toastify";
+import ScreenSaver from "./ScreenSaver";
 // toastConfig({
 //   theme: "ocean-wave",
 //   position: "top-right",
@@ -146,6 +147,44 @@ const HomePage = () => {
   };
 
   const [itemData, setItemData] = useState<MenuData>();
+  const [lastActivity, setLastActivity] = useState(Date.now());
+  const [isScreenSaverActive, setIsScreenSaverActive] = useState(false);
+  const updateLastActivity = useCallback(() => {
+    setLastActivity(Date.now());
+    if (isScreenSaverActive) {
+      setIsScreenSaverActive(false);
+    }
+  }, [isScreenSaverActive]);
+  useEffect(() => {
+    const inactivityTimer = setInterval(() => {
+      const inactiveTime = Date.now() - lastActivity;
+      if (inactiveTime > 60000 && !isScreenSaverActive) {
+        // 60000 ms = 1 minute
+        setIsScreenSaverActive(true);
+      }
+    }, 10000); // Check every 10 seconds
+
+    return () => clearInterval(inactivityTimer);
+  }, [lastActivity, isScreenSaverActive]);
+  useEffect(() => {
+    const activityEvents = [
+      "mousedown",
+      "mousemove",
+      "keypress",
+      "scroll",
+      "touchstart",
+    ];
+
+    activityEvents.forEach((event) => {
+      window.addEventListener(event, updateLastActivity);
+    });
+
+    return () => {
+      activityEvents.forEach((event) => {
+        window.removeEventListener(event, updateLastActivity);
+      });
+    };
+  }, [updateLastActivity]);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [currentPlaying, setCurrentPlaying] = useState({
     artist: "",
@@ -194,6 +233,8 @@ const HomePage = () => {
 
   return (
     <AnimatePresence>
+      {isScreenSaverActive && <ScreenSaver />}
+
       <motion.div
         className="min-h-[80vh] flex-col items-center justify-between text-white p-4"
         initial={{ opacity: 0 }}
