@@ -25,6 +25,7 @@ import {
 import { stat } from "fs";
 import SubjectResultCard from "./SubjectResultCard";
 import ExamModal from "./ExamModal";
+import ExamGenerator from "./ExamGenerator";
 
 export interface AnswerResult {
   attempted: number;
@@ -285,6 +286,7 @@ function MarksPage() {
                     onAnswersChange={handleExamAnswersChange}
                     selectedYear={selectedYear}
                   />
+                  <ExamGenerator />
                   <div className="w-full flex flex-wrap gap-2 mt-4">
                     <Select
                       label="Select Year"
