@@ -155,7 +155,15 @@ export default function ExamGenerator() {
       .padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
   };
 
-  const renderMath = (text: string) => {
+  const renderMath = (text: string, subject: string) => {
+    if (subject === "Programming") {
+      return (
+        <pre className="bg-gray-800 p-4 rounded-lg">
+          <code>{text}</code>
+        </pre>
+      );
+    }
+
     const regex = /\$(.*?)\$/g;
     const parts = text.split(regex);
     return parts.map((part, index) =>
@@ -170,7 +178,7 @@ export default function ExamGenerator() {
       </Button>
 
       <Modal
-        isOpen={false}
+        isOpen={isOpen}
         onClose={onClose}
         scrollBehavior="outside"
         className="dark min-w-[90%] max-h-[100%] bg-gradient-to-tr from-red-700 to-blue-800 overflow-auto"
@@ -192,7 +200,10 @@ export default function ExamGenerator() {
                     {subjectQuestions.map((question, index) => (
                       <div key={`${subject}-${index}`} className="mb-4">
                         <p className="font-semibold">
-                          {renderMath(`${index + 1}. ${question.Question}`)}
+                          {renderMath(
+                            `${index + 1}. ${question.Question}`,
+                            subject
+                          )}
                         </p>
                         <RadioGroup
                           onChange={(e) =>
@@ -216,7 +227,7 @@ export default function ExamGenerator() {
                                   : "d"
                               }
                             >
-                              {renderMath(option)}
+                              {renderMath(option, subject)}
                             </Radio>
                           ))}
                         </RadioGroup>
@@ -228,7 +239,8 @@ export default function ExamGenerator() {
                               question.Answer.split("\n")[1].replace(
                                 "Explanation: ",
                                 ""
-                              )
+                              ),
+                              subject
                             )}
                           </p>
                         )}
@@ -238,12 +250,12 @@ export default function ExamGenerator() {
                 ))
               )}
             </div>
-            <div className="absolute top-0 right-0 w-1/4 p-4 bg-gray-800 rounded-lg shadow-lg">
+            <div className="fixed top-20 right-20 w-1/4 p-4 bg-gray-800 rounded-lg shadow-lg">
               <h3 className="text-lg font-bold mb-2">Score</h3>
               <p>{score.toFixed(2)} / 100</p>
             </div>
           </ModalBody>
-          <ModalFooter>
+          <ModalFooter className="flex justify-end">
             <Button color="danger" variant="light" onPress={onClose}>
               Close
             </Button>
