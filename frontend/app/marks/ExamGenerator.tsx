@@ -11,8 +11,8 @@ import {
   Radio,
   RadioGroup,
 } from "@nextui-org/react";
-import { InlineMath, BlockMath } from 'react-katex';
-import 'katex/dist/katex.min.css';
+import { InlineMath, BlockMath } from "react-katex";
+import "katex/dist/katex.min.css";
 
 interface Question {
   id: number;
@@ -30,7 +30,7 @@ interface AnswerState {
 }
 
 const subjectLocation: { [subject: string]: string[] } = {
-  Math: ["Math11.json", "Math12.json"],
+   Math: [ "Math12.json"],
   Physics: ["Physics11.json", "Physics12.json"],
   Electrical: ["Transformer.json", "DCmachine.json", "ElectricalMachine.json"],
   Electronics: ["analog.json", "Digital.json", "EDC.json"],
@@ -52,7 +52,9 @@ export default function ExamGenerator() {
   const [questions, setQuestions] = useState<SubjectQuestions>({});
   const [loading, setLoading] = useState(false);
   const [answers, setAnswers] = useState<AnswerState>({});
-  const [showExplanations, setShowExplanations] = useState<{ [questionId: string]: boolean }>({});
+  const [showExplanations, setShowExplanations] = useState<{
+    [questionId: string]: boolean;
+  }>({});
   const [timeRemaining, setTimeRemaining] = useState(90 * 60); // 1.5 hours in seconds
   const [score, setScore] = useState(0);
 
@@ -89,7 +91,10 @@ export default function ExamGenerator() {
 
       while (generatedQuestions[subject].length < 10) {
         generatedQuestions[subject].push(
-          generatePlaceholderQuestion(subject, generatedQuestions[subject].length + 1)
+          generatePlaceholderQuestion(
+            subject,
+            generatedQuestions[subject].length + 1
+          )
         );
       }
 
@@ -100,17 +105,24 @@ export default function ExamGenerator() {
     setLoading(false);
   };
 
-  const getRandomQuestions = (questions: Question[], count: number): Question[] => {
+  const getRandomQuestions = (
+    questions: Question[],
+    count: number
+  ): Question[] => {
     const shuffled = [...questions].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, count);
   };
 
-  const generatePlaceholderQuestion = (subject: string, id: number): Question => {
+  const generatePlaceholderQuestion = (
+    subject: string,
+    id: number
+  ): Question => {
     return {
       id,
       Question: `Placeholder question for ${subject}`,
       Options: ["Option A", "Option B", "Option C", "Option D"],
-      Answer: "Answer: Placeholder\nExplanation: This is a placeholder question.",
+      Answer:
+        "Answer: Placeholder\nExplanation: This is a placeholder question.",
     };
   };
 
@@ -118,16 +130,17 @@ export default function ExamGenerator() {
     setAnswers((prev) => ({ ...prev, [questionId]: answer }));
     setShowExplanations((prev) => ({ ...prev, [questionId]: true }));
 
-    const [subject, index] = questionId.split('-');
+    const [subject, index] = questionId.split("-");
     const question = questions[subject][parseInt(index)];
-    const correctAnswer = question.Answer.split('\n')[0].replace('Answer: ', '');
-
+    const correctAnswer = question.Answer.match(regex)?.[1];
+    console.log(correctAnswer + " " + answer);
     if (answer === correctAnswer) {
       setScore((prev) => prev + 1);
     } else {
       setScore((prev) => prev - 0.25);
     }
   };
+  const regex = /Answer: (\w)/;
 
   const startTimer = () => {
     setTimeRemaining(90 * 60);
@@ -137,13 +150,15 @@ export default function ExamGenerator() {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     const remainingSeconds = seconds % 60;
-    return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
+    return `${hours.toString().padStart(2, "0")}:${minutes
+      .toString()
+      .padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
   };
 
   const renderMath = (text: string) => {
     const regex = /\$(.*?)\$/g;
     const parts = text.split(regex);
-    return parts.map((part, index) => 
+    return parts.map((part, index) =>
       index % 2 === 0 ? part : <InlineMath key={index} math={part} />
     );
   };
@@ -155,7 +170,7 @@ export default function ExamGenerator() {
       </Button>
 
       <Modal
-        isOpen={isOpen}
+        isOpen={true}
         onClose={onClose}
         scrollBehavior="outside"
         className="dark min-w-[90%] max-h-[100%] bg-gradient-to-tr from-red-700 to-blue-800 overflow-auto"
@@ -176,21 +191,45 @@ export default function ExamGenerator() {
                     <h2 className="text-xl font-bold mt-4 mb-2">{subject}</h2>
                     {subjectQuestions.map((question, index) => (
                       <div key={`${subject}-${index}`} className="mb-4">
-                        <p className="font-semibold">{renderMath(`${index + 1}. ${question.Question}`)}</p>
+                        <p className="font-semibold">
+                          {renderMath(`${index + 1}. ${question.Question}`)}
+                        </p>
                         <RadioGroup
-                          onChange={(e) => handleAnswerChange(`${subject}-${index}`, e.target.value)}
-                          value={answers[`${subject}-${index}`] || ''}
+                          onChange={(e) =>
+                            handleAnswerChange(
+                              `${subject}-${index}`,
+                              e.target.value
+                            )
+                          }
+                          value={answers[`${subject}-${index}`] || ""}
                         >
                           {question.Options.map((option, optionIndex) => (
-                            <Radio key={optionIndex} value={option.split(') ')[1]}>
+                            <Radio
+                              key={optionIndex}
+                              value={
+                                optionIndex == 0
+                                  ? "a"
+                                  : optionIndex == 1
+                                  ? "b"
+                                  : optionIndex == 2
+                                  ? "c"
+                                  : "d"
+                              }
+                            >
                               {renderMath(option)}
                             </Radio>
                           ))}
                         </RadioGroup>
                         {showExplanations[`${subject}-${index}`] && (
                           <p className="mt-2">
+                            <p>{question.Answer.match(regex)?.[0]}</p>
                             <strong>Explanation:</strong>{" "}
-                            {renderMath(question.Answer.split('\n')[1].replace('Explanation: ', ''))}
+                            {renderMath(
+                              question.Answer.split("\n")[1].replace(
+                                "Explanation: ",
+                                ""
+                              )
+                            )}
                           </p>
                         )}
                       </div>
