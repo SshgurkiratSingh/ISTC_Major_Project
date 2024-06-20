@@ -30,7 +30,7 @@ interface AnswerState {
 }
 
 const subjectLocation: { [subject: string]: string[] } = {
-   Math: [ "Math12.json"],
+  Math: ["Math12.json"],
   Physics: ["Physics11.json", "Physics12.json"],
   Electrical: ["Transformer.json", "DCmachine.json", "ElectricalMachine.json"],
   Electronics: ["analog.json", "Digital.json", "EDC.json"],
@@ -170,7 +170,7 @@ export default function ExamGenerator() {
       </Button>
 
       <Modal
-        isOpen={true}
+        isOpen={false}
         onClose={onClose}
         scrollBehavior="outside"
         className="dark min-w-[90%] max-h-[100%] bg-gradient-to-tr from-red-700 to-blue-800 overflow-auto"
