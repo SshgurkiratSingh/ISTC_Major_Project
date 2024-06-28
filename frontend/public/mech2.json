@@ -1,14 +1,14 @@
 [
     {
         "id": 1,
-        "Question": "Each dimensional formula is in which form?",
+        "Question": "Question here",
         "Options": [
-            "a) [MLT]",
-            "b) [MDT]           ",
-            "c) [SDT]           ",
-            "d) [SVT]"
+            "a) Option1 ",
+            "b) Option2",
+            "c) Option3 ",
+            "d) Option4"
         ],
-        "Answer": "Answer: a\nExplanation:  Every dimensionless formula is represented as the function of the [MLT], where M is the mass, L is the length and T is the time."
+        "Answer": "Answer:  b\nExplanation: "
     },
     {
         "id": 2,
