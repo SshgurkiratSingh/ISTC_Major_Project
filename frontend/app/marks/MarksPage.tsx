@@ -84,7 +84,7 @@ const storedPapers: { [key: string]: string } = {
 
 function MarksPage() {
   const [correctAnswer, setCorrectAnswer] = useState<string>(
-    storedPapers["2023"]
+    storedPapers["2024"]
   );
   const [subjectResults, setSubjectResults] = useState<SubjectResults>({});
   const [userInput, setUserInput] = useState<string>("");
@@ -97,7 +97,7 @@ function MarksPage() {
     xCount: 0,
     detailedCheck: {},
   });
-  const [selectedYear, setSelectedYear] = useState<string>("2023");
+  const [selectedYear, setSelectedYear] = useState<string>("2024");
 
   const handleExamAnswersChange = (answers: string) => {
     setUserInput(answers);
